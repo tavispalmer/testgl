@@ -27,7 +27,7 @@ impl TestGL {
     pub const MAX_WIDTH: u32 = 2048;
     pub const MAX_HEIGHT: u32 = 2048;
 
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             width: Self::BASE_WIDTH,
             height: Self::BASE_HEIGHT,

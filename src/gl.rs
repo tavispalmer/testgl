@@ -121,7 +121,7 @@ impl Context {
         let glVertexAttribPointer = unsafe { mem::transmute(get_proc_address(c"glVertexAttribPointer")) };
         let glBindFramebuffer = unsafe { mem::transmute(get_proc_address(c"glBindFramebuffer")) };
         let glBindVertexArray = unsafe { mem::transmute(get_proc_address(c"glBindVertexArray")) };
-        let glDeleteVertexArrays = unsafe { mem::transmute(get_proc_address(c"glDeleteVertexArrayas")) };
+        let glDeleteVertexArrays = unsafe { mem::transmute(get_proc_address(c"glDeleteVertexArrays")) };
         let glGenVertexArrays = unsafe { mem::transmute(get_proc_address(c"glGenVertexArrays")) };
         Self {
             glClearColor,

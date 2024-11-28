@@ -4,7 +4,7 @@ use std::{ffi::{c_char, c_uint, c_void, CStr, CString}, mem, ptr};
 
 use crate::{retro, TestGL};
 
-static mut TESTGL: Option<TestGL> = None;
+static mut TESTGL: TestGL = TestGL::new();
 
 static mut HW_RENDER: retro::HwRenderCallback = retro::HwRenderCallback {
     context_type: retro::HwContextType::None,
@@ -122,7 +122,6 @@ pub extern "C" fn retro_set_controller_port_device(port: c_uint, device: c_uint)
 pub extern "C" fn retro_reset() {}
 
 fn update_variables() {
-    let testgl = unsafe { TESTGL.as_mut().unwrap_unchecked() };
     let environ_cb = unsafe { ENVIRON_CB.unwrap_unchecked() };
 
     let mut var = retro::Variable {
@@ -134,9 +133,11 @@ fn update_variables() {
         let cstr = unsafe { CStr::from_ptr(var.value) };
         let string = String::from_utf8_lossy(cstr.to_bytes()).to_string();
         let result: Vec<_> = string.split('x').collect();
-        testgl.width = result[0].parse().unwrap();
-        testgl.height = result[1].parse().unwrap();
-        eprintln!("[libretro-test]: Got size: {} x {}.", testgl.width, testgl.height);
+        unsafe {
+            TESTGL.width = result[0].parse().unwrap();
+            TESTGL.height = result[1].parse().unwrap();
+            eprintln!("[libretro-test]: Got size: {} x {}.", TESTGL.width, TESTGL.height);
+        }
     }
 
     var.key = c"testgl_multisample".as_ptr();
@@ -152,8 +153,8 @@ fn update_variables() {
 
 #[no_mangle]
 pub extern "C" fn retro_run() {
-    let testgl = unsafe { TESTGL.as_mut().unwrap_unchecked() };
     let environ_cb = unsafe { ENVIRON_CB.unwrap_unchecked() };
+    let video_cb = unsafe { VIDEO_CB.unwrap_unchecked() };
     let input_poll_cb = unsafe { INPUT_POLL_CB.unwrap_unchecked() };
 
     let mut updated = false;
@@ -164,7 +165,8 @@ pub extern "C" fn retro_run() {
     unsafe { input_poll_cb() };
 
     let framebuffer = unsafe { HW_RENDER.get_current_framebuffer.unwrap_unchecked()() } as _;
-    testgl.run(framebuffer);
+    unsafe { TESTGL.run(framebuffer) };
+    unsafe { video_cb(retro::HW_FRAME_BUFFER_VALID, TESTGL.width, TESTGL.height, 0) };
 }
 
 #[no_mangle]
@@ -187,17 +189,17 @@ fn retro_init_hw_context() -> bool {
     let environ_cb = unsafe { ENVIRON_CB.unwrap_unchecked() };
 
     extern "C" fn context_reset() {
-        let testgl = unsafe { TESTGL.as_mut().unwrap_unchecked() };
-
         eprintln!("Context reset!");
-        testgl.context_reset(|cstr| unsafe { HW_RENDER.get_proc_address.unwrap_unchecked()(cstr.as_ptr()) } );
+        unsafe {
+            TESTGL.context_reset(|cstr| HW_RENDER.get_proc_address.unwrap_unchecked()(cstr.as_ptr()));
+        }
     }
 
     extern "C" fn context_destroy() {
-        let testgl = unsafe { TESTGL.as_mut().unwrap_unchecked() };
-
         eprintln!("Context destroy!");
-        testgl.context_destroy();
+        unsafe {
+            TESTGL.context_destroy();
+        }
     }
 
     unsafe {
