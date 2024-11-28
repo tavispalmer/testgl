@@ -5,6 +5,7 @@ edition = "2021"
 
 [lib]
 name = "testgl"
-crate-type = ["cdylib"]
+crate-type = ["lib", "cdylib"]
 
 [dependencies]
+glfw = "*"

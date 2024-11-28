@@ -93,36 +93,36 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn load<F>(get_proc_address: F) -> Self
-        where F: Fn(&CStr) -> Option<unsafe extern "C" fn()> {
-        let glClearColor = unsafe { mem::transmute(get_proc_address(c"glClearColor")) };
-        let glClear = unsafe { mem::transmute(get_proc_address(c"glClear")) };
-        let glEnable = unsafe { mem::transmute(get_proc_address(c"glEnable")) };
-        let glViewport = unsafe { mem::transmute(get_proc_address(c"glViewport")) };
-        let glDrawArrays = unsafe { mem::transmute(get_proc_address(c"glDrawArrays")) };
-        let glBindBuffer = unsafe { mem::transmute(get_proc_address(c"glBindBuffer")) };
-        let glDeleteBuffers = unsafe { mem::transmute(get_proc_address(c"glDeleteBuffers")) };
-        let glGenBuffers = unsafe { mem::transmute(get_proc_address(c"glGenBuffers")) };
-        let glBufferData = unsafe { mem::transmute(get_proc_address(c"glBufferData")) };
-        let glAttachShader = unsafe { mem::transmute(get_proc_address(c"glAttachShader")) };
-        let glCompileShader = unsafe { mem::transmute(get_proc_address(c"glCompileShader")) };
-        let glCreateProgram = unsafe { mem::transmute(get_proc_address(c"glCreateProgram")) };
-        let glCreateShader = unsafe { mem::transmute(get_proc_address(c"glCreateShader")) };
-        let glDeleteProgram = unsafe { mem::transmute(get_proc_address(c"glDeleteProgram")) };
-        let glDeleteShader = unsafe { mem::transmute(get_proc_address(c"glDeleteShader")) };
-        let glDisableVertexAttribArray = unsafe { mem::transmute(get_proc_address(c"glDisableVertexAttribArray")) };
-        let glEnableVertexAttribArray = unsafe { mem::transmute(get_proc_address(c"glEnableVertexAttribArray")) };
-        let glGetAttribLocation = unsafe { mem::transmute(get_proc_address(c"glGetAttribLocation")) };
-        let glGetUniformLocation = unsafe { mem::transmute(get_proc_address(c"glGetUniformLocation")) };
-        let glLinkProgram = unsafe { mem::transmute(get_proc_address(c"glLinkProgram")) };
-        let glShaderSource = unsafe { mem::transmute(get_proc_address(c"glShaderSource")) };
-        let glUseProgram = unsafe { mem::transmute(get_proc_address(c"glUseProgram")) };
-        let glUniformMatrix4fv = unsafe { mem::transmute(get_proc_address(c"glUniformMatrix4fv")) };
-        let glVertexAttribPointer = unsafe { mem::transmute(get_proc_address(c"glVertexAttribPointer")) };
-        let glBindFramebuffer = unsafe { mem::transmute(get_proc_address(c"glBindFramebuffer")) };
-        let glBindVertexArray = unsafe { mem::transmute(get_proc_address(c"glBindVertexArray")) };
-        let glDeleteVertexArrays = unsafe { mem::transmute(get_proc_address(c"glDeleteVertexArrays")) };
-        let glGenVertexArrays = unsafe { mem::transmute(get_proc_address(c"glGenVertexArrays")) };
+    pub fn load<F>(mut get_proc_address: F) -> Self
+        where F: FnMut(&str) -> Option<unsafe extern "C" fn()> {
+        let glClearColor = unsafe { mem::transmute(get_proc_address("glClearColor")) };
+        let glClear = unsafe { mem::transmute(get_proc_address("glClear")) };
+        let glEnable = unsafe { mem::transmute(get_proc_address("glEnable")) };
+        let glViewport = unsafe { mem::transmute(get_proc_address("glViewport")) };
+        let glDrawArrays = unsafe { mem::transmute(get_proc_address("glDrawArrays")) };
+        let glBindBuffer = unsafe { mem::transmute(get_proc_address("glBindBuffer")) };
+        let glDeleteBuffers = unsafe { mem::transmute(get_proc_address("glDeleteBuffers")) };
+        let glGenBuffers = unsafe { mem::transmute(get_proc_address("glGenBuffers")) };
+        let glBufferData = unsafe { mem::transmute(get_proc_address("glBufferData")) };
+        let glAttachShader = unsafe { mem::transmute(get_proc_address("glAttachShader")) };
+        let glCompileShader = unsafe { mem::transmute(get_proc_address("glCompileShader")) };
+        let glCreateProgram = unsafe { mem::transmute(get_proc_address("glCreateProgram")) };
+        let glCreateShader = unsafe { mem::transmute(get_proc_address("glCreateShader")) };
+        let glDeleteProgram = unsafe { mem::transmute(get_proc_address("glDeleteProgram")) };
+        let glDeleteShader = unsafe { mem::transmute(get_proc_address("glDeleteShader")) };
+        let glDisableVertexAttribArray = unsafe { mem::transmute(get_proc_address("glDisableVertexAttribArray")) };
+        let glEnableVertexAttribArray = unsafe { mem::transmute(get_proc_address("glEnableVertexAttribArray")) };
+        let glGetAttribLocation = unsafe { mem::transmute(get_proc_address("glGetAttribLocation")) };
+        let glGetUniformLocation = unsafe { mem::transmute(get_proc_address("glGetUniformLocation")) };
+        let glLinkProgram = unsafe { mem::transmute(get_proc_address("glLinkProgram")) };
+        let glShaderSource = unsafe { mem::transmute(get_proc_address("glShaderSource")) };
+        let glUseProgram = unsafe { mem::transmute(get_proc_address("glUseProgram")) };
+        let glUniformMatrix4fv = unsafe { mem::transmute(get_proc_address("glUniformMatrix4fv")) };
+        let glVertexAttribPointer = unsafe { mem::transmute(get_proc_address("glVertexAttribPointer")) };
+        let glBindFramebuffer = unsafe { mem::transmute(get_proc_address("glBindFramebuffer")) };
+        let glBindVertexArray = unsafe { mem::transmute(get_proc_address("glBindVertexArray")) };
+        let glDeleteVertexArrays = unsafe { mem::transmute(get_proc_address("glDeleteVertexArrays")) };
+        let glGenVertexArrays = unsafe { mem::transmute(get_proc_address("glGenVertexArrays")) };
         Self {
             glClearColor,
             glClear,

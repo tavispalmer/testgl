@@ -45,8 +45,16 @@ impl TestGL {
         }
     }
 
+    pub fn width(&self) -> u32 {
+        self.width
+    }
+
     pub fn set_width(&mut self, width: u32) {
         self.width = width;
+    }
+    
+    pub fn height(&self) -> u32 {
+        self.height
     }
 
     pub fn set_height(&mut self, height: u32) {
@@ -182,7 +190,7 @@ void main() {
     }
 
     pub fn context_reset<F>(&mut self, get_proc_address: F)
-        where F: Fn(&CStr) -> Option<unsafe extern "C" fn()> {
+        where F: FnMut(&str) -> Option<unsafe extern "C" fn()> {
         self.gl = Some(gl::Context::load(get_proc_address));
         self.compile_program();
         self.setup_vao();
