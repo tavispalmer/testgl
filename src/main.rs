@@ -21,6 +21,8 @@ fn main() {
     window.set_size_polling(true);
     window.make_current();
 
+    glfw.set_swap_interval(glfw::SwapInterval::Sync(1));
+
     testgl.context_reset(|str| unsafe { mem::transmute(window.get_proc_address(str)) } );
 
     while !window.should_close() {
