@@ -261,7 +261,7 @@ impl TestGL {
 
     pub fn context_reset<F>(&mut self, get_proc_address: F)
         where F: FnMut(&str) -> Option<unsafe extern "C" fn()> {
-        self.gl = Some(gl::Context::load(get_proc_address));
+        self.gl = gl::Context::load(get_proc_address);
         self.compile_program();
         self.setup_vao();
         self.context_alive = true;
