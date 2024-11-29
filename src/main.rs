@@ -17,7 +17,7 @@ fn main() {
     let (width, height) = window.get_framebuffer_size();
     testgl.set_width(width as _);
     testgl.set_height(height as _);
-    testgl.init_multisample(1);
+    testgl.init_multisample(4);
 
     window.set_framebuffer_size_polling(true);
     window.make_current();
