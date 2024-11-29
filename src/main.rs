@@ -7,9 +7,13 @@ fn main() {
     let mut testgl = TestGL::new();
 
     let mut glfw = glfw::init(glfw::fail_on_errors).unwrap();
-    glfw.window_hint(glfw::WindowHint::ContextVersion(3, 2));
-    glfw.window_hint(glfw::WindowHint::OpenGlForwardCompat(true));
-    glfw.window_hint(glfw::WindowHint::OpenGlProfile(glfw::OpenGlProfileHint::Core));
+
+    #[cfg(target_os = "macos")]
+    {
+        glfw.window_hint(glfw::WindowHint::ContextVersion(3, 2));
+        glfw.window_hint(glfw::WindowHint::OpenGlForwardCompat(true));
+        glfw.window_hint(glfw::WindowHint::OpenGlProfile(glfw::OpenGlProfileHint::Core));
+    }
 
     let (mut window, events) = glfw.create_window(testgl.width(), testgl.height(), "TestGL", glfw::WindowMode::Windowed)
         .unwrap();
