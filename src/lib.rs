@@ -13,9 +13,9 @@ pub struct TestGL {
     multisample_fbo: bool,
     multisample: u32,
     vao: [u32; 1],
-    fbo: u32,
-    rbo_color: u32,
-    rbo_depth_stencil: u32,
+    fbo: [u32; 1],
+    rbo_color: [u32; 1],
+    rbo_depth_stencil:[u32; 1],
     frame_count: u32,
 
     gl: Option<gl::Context>,
@@ -37,9 +37,9 @@ impl TestGL {
             multisample_fbo: false,
             multisample: 0,
             vao: [0],
-            fbo: 0,
-            rbo_color: 0,
-            rbo_depth_stencil: 0,
+            fbo: [0],
+            rbo_color: [0],
+            rbo_depth_stencil: [0],
             frame_count: 0,
             gl: None,
         }
@@ -100,6 +100,65 @@ void main() {
         }
     }
 
+    pub fn init_multisample(&mut self, samples: u32) {
+        self.multisample = samples;
+        if !self.context_alive {
+            return;
+        }
+
+        let gl = self.gl.as_ref().unwrap();
+
+        unsafe {
+            if self.rbo_color[0] != 0 {
+                gl.delete_renderbuffers(&self.rbo_color);
+            }
+            if self.rbo_depth_stencil[0] != 0 {
+                gl.delete_renderbuffers(&self.rbo_depth_stencil);
+            }
+            if self.fbo[0] != 0 {
+                gl.delete_framebuffers(&self.fbo);
+            }
+
+            self.rbo_color[0] = 0;
+            self.rbo_depth_stencil[0] = 0;
+            self.fbo[0] = 0;
+            self.multisample_fbo = false;
+            if samples <= 1 {
+                return;
+            }
+
+            gl.gen_renderbuffers(&mut self.rbo_color);
+            gl.gen_renderbuffers(&mut self.rbo_depth_stencil);
+            gl.gen_framebuffers(&mut self.fbo);
+
+            gl.bind_renderbuffer(gl::RENDERBUFFER, self.rbo_color[0]);
+            gl.renderbuffer_storage_multisample(gl::RENDERBUFFER,
+                samples as _, gl::RGBA, Self::MAX_WIDTH as _, Self::MAX_HEIGHT as _);
+            gl.bind_renderbuffer(gl::RENDERBUFFER, self.rbo_depth_stencil[0]);
+            gl.renderbuffer_storage_multisample(gl::RENDERBUFFER,
+                samples as _, gl::DEPTH24_STENCIL8, Self::MAX_WIDTH as _, Self::MAX_HEIGHT as _);
+            gl.bind_renderbuffer(gl::RENDERBUFFER, 0);
+
+            gl.gen_framebuffers(&mut self.fbo);
+            gl.bind_framebuffer(gl::FRAMEBUFFER, self.fbo[0]);
+
+            gl.framebuffer_renderbuffer(gl::FRAMEBUFFER, gl::COLOR_ATTACHMENT0,
+                gl::RENDERBUFFER, self.rbo_color[0]);
+            gl.framebuffer_renderbuffer(gl::FRAMEBUFFER, gl::DEPTH_STENCIL_ATTACHMENT,
+                gl::RENDERBUFFER, self.rbo_depth_stencil[0]);
+            
+            let ret = gl.check_framebuffer_status(gl::FRAMEBUFFER);
+            if ret == gl::FRAMEBUFFER_COMPLETE {
+                eprintln!("Using multisampled FBO.");
+                self.multisample_fbo = true;
+            } else {
+                eprintln!("Multisample FBO failed.");
+            }
+
+            gl.bind_framebuffer(gl::FRAMEBUFFER, 0);
+        }
+    }
+
     fn setup_vao(&mut self) {
         let gl = self.gl.as_ref().unwrap();
 
@@ -133,7 +192,11 @@ void main() {
 
         unsafe {
             gl.bind_vertex_array(self.vao[0]);
-            gl.bind_framebuffer(gl::FRAMEBUFFER, framebuffer);
+            if self.multisample_fbo {
+                gl.bind_framebuffer(gl::FRAMEBUFFER, self.fbo[0]);
+            } else {
+                gl.bind_framebuffer(gl::FRAMEBUFFER, framebuffer);
+            }
 
             gl.clear_color(0.3, 0.4, 0.5, 1.0);
             gl.viewport(0, 0, self.width as _, self.height as _);
@@ -184,6 +247,15 @@ void main() {
             gl.use_program(0);
 
             gl.bind_vertex_array(0);
+            if self.multisample_fbo {
+                gl.bind_framebuffer(gl::READ_FRAMEBUFFER, self.fbo[0]);
+                gl.bind_framebuffer(gl::DRAW_FRAMEBUFFER, framebuffer);
+                gl.blit_framebuffer(0, 0, self.width as _, self.height as _,
+                    0, 0, self.width as _, self.height as _,
+                    gl::COLOR_BUFFER_BIT, gl::NEAREST);
+                gl.bind_framebuffer(gl::READ_FRAMEBUFFER, 0);
+                gl.bind_framebuffer(gl::DRAW_FRAMEBUFFER, 0);
+            }
 
             self.frame_count += 1;
         }
@@ -194,18 +266,30 @@ void main() {
         self.gl = Some(gl::Context::load(get_proc_address));
         self.compile_program();
         self.setup_vao();
+        self.context_alive = true;
+        self.init_multisample(self.multisample);
     }
 
     pub fn context_destroy(&mut self) {
-        let gl = self.gl.as_ref().unwrap();
         unsafe {
-            gl.delete_vertex_arrays(&self.vao);
+            self.gl.as_ref().unwrap().delete_vertex_arrays(&self.vao);
             self.vao[0] = 0;
+            self.init_multisample(0);
+            self.context_alive = false;
+            let gl = self.gl.as_ref().unwrap();
             gl.delete_buffers(&self.vbo);
             self.vbo[0] = 0;
             gl.delete_program(self.prog);
             self.prog = 0;
         }
         self.gl = None;
+    }
+}
+
+impl Drop for TestGL {
+    fn drop(&mut self) {
+        if self.gl.is_some() {
+            self.context_destroy();
+        }
     }
 }

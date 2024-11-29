@@ -16,6 +16,8 @@ pub const TRUE: GLboolean = 1;  // 140
 pub const FLOAT: GLenum = 0x1406;   // 149
 pub const TRIANGLE_STRIP: GLenum = 0x0005;  // 161
 pub const DEPTH_TEST: GLenum = 0x0B71;  // 267
+pub const RGBA: GLenum = 0x1908;    // 469
+pub const NEAREST: GLenum = 0x2600; // 644
 pub const DEPTH_BUFFER_BIT: GLbitfield = 0x00000100;    // 676
 pub const STENCIL_BUFFER_BIT: GLbitfield = 0x00000400;  // 678
 pub const COLOR_BUFFER_BIT: GLbitfield = 0x00004000;    // 682
@@ -35,7 +37,14 @@ pub const ARRAY_BUFFER: GLenum = 0x8892;    // 458
 pub const STATIC_DRAW: GLenum = 0x88E4;     // 472
 pub const FRAGMENT_SHADER: GLenum = 0x8B30; // 580
 pub const VERTEX_SHADER: GLenum = 0x8B31;   // 581
+pub const DEPTH_STENCIL_ATTACHMENT: GLenum = 0x821A; // 979
+pub const DEPTH24_STENCIL8: GLenum = 0x88F0;    // 983
+pub const READ_FRAMEBUFFER: GLenum = 0x8CA8;    // 994
+pub const DRAW_FRAMEBUFFER: GLenum = 0x8CA9;    // 995
+pub const FRAMEBUFFER_COMPLETE: GLenum = 0x8CD5;    // 1003
+pub const COLOR_ATTACHMENT0: GLenum = 0x8CE0;   // 1010
 pub const FRAMEBUFFER: GLenum = 0x8D40;     // 1044
+pub const RENDERBUFFER: GLenum = 0x8D41;    // 1045
 
 type PFNGLBINDBUFFERPROC = Option<unsafe extern "C" fn(target: GLenum, buffer: GLuint)>;    // 510
 type PFNGLDELETEBUFFERSPROC = Option<unsafe extern "C" fn(n: GLsizei, buffers: *const GLuint)>; // 511
@@ -56,7 +65,16 @@ type PFNGLSHADERSOURCEPROC = Option<unsafe extern "C" fn(shader: GLuint, count: 
 type PFNGLUSEPROGRAMPROC = Option<unsafe extern "C" fn(program: GLuint)>;   // 666
 type PFNGLUNIFORMMATRIX4FVPROC = Option<unsafe extern "C" fn(location: GLint, count: GLsizei, transpose: GLboolean, value: *const GLfloat)>;    // 685
 type PFNGLVERTEXATTRIBPOINTERPROC = Option<unsafe extern "C" fn(index: GLuint, size: GLint, type_: GLenum, normalized: GLboolean, stride: GLsizei, pointer: *const c_void)>;    // 723
+type PFNGLBINDRENDERBUFFERPROC = Option<unsafe extern "C" fn(target: GLenum, renderbuffer: GLuint)>;    // 1161
+type PFNGLDELETERENDERBUFFERSPROC = Option<unsafe extern "C" fn(n: GLsizei, renderbuffers: *const GLuint)>; // 1162
+type PFNGLGENRENDERBUFFERSPROC = Option<unsafe extern "C" fn(n: GLsizei, renderbuffers: *mut GLuint)>;  // 1163
 type PFNGLBINDFRAMEBUFFERPROC = Option<unsafe extern "C" fn(target: GLenum, framebuffer: GLuint)>;  // 1167
+type PFNGLDELETEFRAMEBUFFERSPROC = Option<unsafe extern "C" fn(n: GLsizei, framebuffers: *const GLuint)>;   // 1168
+type PFNGLGENFRAMEBUFFERSPROC = Option<unsafe extern "C" fn(n: GLsizei, framebuffers: *mut GLuint)>;    // 1169
+type PFNGLCHECKFRAMEBUFFERSTATUSPROC = Option<unsafe extern "C" fn(target: GLenum) -> GLenum>;  // 1170
+type PFNGLFRAMEBUFFERRENDERBUFFERPROC = Option<unsafe extern "C" fn(target: GLenum, attachment: GLenum, renderbuffertarget: GLenum, renderbuffer: GLuint)>; // 1174
+type PFNGLBLITFRAMEBUFFERPROC = Option<unsafe extern "C" fn(srcX0: GLint, srcY0: GLint, srcX1: GLint, srcY1: GLint, dstX0: GLint, dstY0: GLint, dstX1: GLint, dstY1: GLint, mask: GLbitfield, filter: GLenum)>; // 1177
+type PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC = Option<unsafe extern "C" fn(target: GLenum, samples: GLsizei, internalformat: GLenum, width: GLsizei, height: GLsizei)>; // 1178
 type PFNGLBINDVERTEXARRAYPROC = Option<unsafe extern "C" fn(array: GLuint)>;    // 1182
 type PFNGLDELETEVERTEXARRAYSPROC = Option<unsafe extern "C" fn(n: GLsizei, arrays: *const GLuint)>; // 1183
 type PFNGLGENVERTEXARRAYSPROC = Option<unsafe extern "C" fn(n: GLsizei, arrays: *mut GLuint)>;  // 1184
@@ -86,7 +104,16 @@ pub struct Context {
     glUseProgram: PFNGLUSEPROGRAMPROC,
     glUniformMatrix4fv: PFNGLUNIFORMMATRIX4FVPROC,
     glVertexAttribPointer: PFNGLVERTEXATTRIBPOINTERPROC,
+    glBindRenderbuffer: PFNGLBINDRENDERBUFFERPROC,
+    glDeleteRenderbuffers: PFNGLDELETERENDERBUFFERSPROC,
+    glGenRenderbuffers: PFNGLGENRENDERBUFFERSPROC,
     glBindFramebuffer: PFNGLBINDFRAMEBUFFERPROC,
+    glDeleteFramebuffers: PFNGLDELETEFRAMEBUFFERSPROC,
+    glGenFramebuffers: PFNGLGENFRAMEBUFFERSPROC,
+    glCheckFramebufferStatus: PFNGLCHECKFRAMEBUFFERSTATUSPROC,
+    glFramebufferRenderbuffer: PFNGLFRAMEBUFFERRENDERBUFFERPROC,
+    glBlitFramebuffer: PFNGLBLITFRAMEBUFFERPROC,
+    glRenderbufferStorageMultisample: PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC,
     glBindVertexArray: PFNGLBINDVERTEXARRAYPROC,
     glDeleteVertexArrays: PFNGLDELETEVERTEXARRAYSPROC,
     glGenVertexArrays: PFNGLGENVERTEXARRAYSPROC,
@@ -119,7 +146,16 @@ impl Context {
         let glUseProgram = unsafe { mem::transmute(get_proc_address("glUseProgram")) };
         let glUniformMatrix4fv = unsafe { mem::transmute(get_proc_address("glUniformMatrix4fv")) };
         let glVertexAttribPointer = unsafe { mem::transmute(get_proc_address("glVertexAttribPointer")) };
+        let glBindRenderbuffer = unsafe { mem::transmute(get_proc_address("glBindRenderbuffer")) };
+        let glDeleteRenderbuffers = unsafe { mem::transmute(get_proc_address("glDeleteRenderbuffers")) };
+        let glGenRenderbuffers = unsafe { mem::transmute(get_proc_address("glGenRenderbuffers")) };
         let glBindFramebuffer = unsafe { mem::transmute(get_proc_address("glBindFramebuffer")) };
+        let glDeleteFramebuffers = unsafe { mem::transmute(get_proc_address("glDeleteFramebuffers")) };
+        let glGenFramebuffers = unsafe { mem::transmute(get_proc_address("glGenFramebuffers")) };
+        let glCheckFramebufferStatus = unsafe { mem::transmute(get_proc_address("glCheckFramebufferStatus")) };
+        let glFramebufferRenderbuffer = unsafe { mem::transmute(get_proc_address("glFramebufferRenderbuffer")) };
+        let glBlitFramebuffer = unsafe { mem::transmute(get_proc_address("glBlitFramebuffer")) };
+        let glRenderbufferStorageMultisample = unsafe { mem::transmute(get_proc_address("glRenderbufferStorageMultisample")) };
         let glBindVertexArray = unsafe { mem::transmute(get_proc_address("glBindVertexArray")) };
         let glDeleteVertexArrays = unsafe { mem::transmute(get_proc_address("glDeleteVertexArrays")) };
         let glGenVertexArrays = unsafe { mem::transmute(get_proc_address("glGenVertexArrays")) };
@@ -148,7 +184,16 @@ impl Context {
             glUseProgram,
             glUniformMatrix4fv,
             glVertexAttribPointer,
+            glBindRenderbuffer,
+            glDeleteRenderbuffers,
+            glGenRenderbuffers,
             glBindFramebuffer,
+            glDeleteFramebuffers,
+            glGenFramebuffers,
+            glCheckFramebufferStatus,
+            glFramebufferRenderbuffer,
+            glBlitFramebuffer,
+            glRenderbufferStorageMultisample,
             glBindVertexArray,
             glDeleteVertexArrays,
             glGenVertexArrays,
@@ -254,8 +299,44 @@ impl Context {
         self.glVertexAttribPointer.unwrap_unchecked()(index, size as _, type_, if normalized { TRUE } else { FALSE }, stride as _, pointer as _)
     }
 
+    pub unsafe fn bind_renderbuffer(&self, target: GLenum, renderbuffer: GLuint) {
+        self.glBindRenderbuffer.unwrap_unchecked()(target, renderbuffer)
+    }
+
+    pub unsafe fn delete_renderbuffers(&self, renderbuffers: &[GLuint]) {
+        self.glDeleteRenderbuffers.unwrap_unchecked()(renderbuffers.len() as _, renderbuffers.as_ptr())
+    }
+
+    pub unsafe fn gen_renderbuffers(&self, renderbuffers: &mut [GLuint]) {
+        self.glGenRenderbuffers.unwrap_unchecked()(renderbuffers.len() as _, renderbuffers.as_mut_ptr())
+    }
+
     pub unsafe fn bind_framebuffer(&self, target: GLenum, framebuffer: GLuint) {
         self.glBindFramebuffer.unwrap_unchecked()(target, framebuffer)
+    }
+
+    pub unsafe fn delete_framebuffers(&self, framebuffers: &[GLuint]) {
+        self.glDeleteFramebuffers.unwrap_unchecked()(framebuffers.len() as _, framebuffers.as_ptr())
+    }
+
+    pub unsafe fn gen_framebuffers(&self, framebuffers: &mut [GLuint]) {
+        self.glGenFramebuffers.unwrap_unchecked()(framebuffers.len() as _, framebuffers.as_mut_ptr())
+    }
+
+    pub unsafe fn check_framebuffer_status(&self, target: GLenum) -> GLenum {
+        self.glCheckFramebufferStatus.unwrap_unchecked()(target)
+    }
+
+    pub unsafe fn framebuffer_renderbuffer(&self, target: GLenum, attachment: GLenum, renderbuffertarget: GLenum, renderbuffer: GLuint) {
+        self.glFramebufferRenderbuffer.unwrap_unchecked()(target, attachment, renderbuffertarget, renderbuffer)
+    }
+
+    pub unsafe fn blit_framebuffer(&self, srcX0: GLint, srcY0: GLint, srcX1: GLint, srcY1: GLint, dstX0: GLint, dstY0: GLint, dstX1: GLint, dstY1: GLint, mask: GLbitfield, filter: GLenum) {
+        self.glBlitFramebuffer.unwrap_unchecked()(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter)
+    }
+
+    pub unsafe fn renderbuffer_storage_multisample(&self, target: GLenum, samples: GLsizei, internalformat: GLenum, width: GLsizei, height: GLsizei) {
+        self.glRenderbufferStorageMultisample.unwrap_unchecked()(target, samples, internalformat, width, height)
     }
 
     pub unsafe fn bind_vertex_array(&self, array: GLuint) {
