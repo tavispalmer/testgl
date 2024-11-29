@@ -9,3 +9,7 @@ crate-type = ["lib", "cdylib"]
 
 [dependencies]
 glfw = "*"
+
+[features]
+default = ["core"]
+core = []

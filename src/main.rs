@@ -8,7 +8,7 @@ fn main() {
 
     let mut glfw = glfw::init(glfw::fail_on_errors).unwrap();
 
-    #[cfg(target_os = "macos")]
+    #[cfg(feature = "core")]
     {
         glfw.window_hint(glfw::WindowHint::ContextVersion(3, 2));
         glfw.window_hint(glfw::WindowHint::OpenGlForwardCompat(true));
@@ -21,12 +21,16 @@ fn main() {
     let (width, height) = window.get_framebuffer_size();
     testgl.set_width(width as _);
     testgl.set_height(height as _);
+    #[cfg(feature = "core")]
     testgl.init_multisample(1);
 
     window.set_framebuffer_size_polling(true);
     window.make_current();
 
-    testgl.context_reset(|str| unsafe { mem::transmute(window.get_proc_address(str)) } );
+    testgl.context_reset(|cstr| {
+        let str = String::from_utf8_lossy(cstr.to_bytes()).to_string();
+        window.get_proc_address(&str)
+    });
 
     glfw.set_swap_interval(glfw::SwapInterval::Sync(1));
 

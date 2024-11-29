@@ -33,6 +33,7 @@ pub extern "C" fn retro_set_environment(cb: retro::Environment) {
     unsafe { ENVIRON_CB = cb };
     let cb = unsafe { cb.unwrap_unchecked() };
 
+    #[cfg(feature = "core")]
     const VARIABLES: [retro::Variable; 3] = [
         retro::Variable {
             key: c"testgl_resolution".as_ptr(),
@@ -41,6 +42,15 @@ pub extern "C" fn retro_set_environment(cb: retro::Environment) {
         retro::Variable {
             key: c"testgl_multisample".as_ptr(),
             value: c"Multisampling; 1x|2x|4x".as_ptr(),
+        },
+        retro::Variable { key: ptr::null(), value: ptr::null() },
+    ];
+
+    #[cfg(not(feature = "core"))]
+    const VARIABLES: [retro::Variable; 2] = [
+        retro::Variable {
+            key: c"testgl_resolution".as_ptr(),
+            value: c"Internal resolution; 320x240|360x480|480x272|512x384|512x512|640x240|640x448|640x480|720x576|800x600|960x720|1024x768|1024x1024|1280x720|1280x960|1600x1200|1920x1080|1920x1440|1920x1600|2048x2048".as_ptr(),
         },
         retro::Variable { key: ptr::null(), value: ptr::null() },
     ];
@@ -140,15 +150,18 @@ fn update_variables() {
         }
     }
 
-    var.key = c"testgl_multisample".as_ptr();
-    var.value = ptr::null();
+    #[cfg(feature = "core")]
+    {
+        var.key = c"testgl_multisample".as_ptr();
+        var.value = ptr::null();
 
-    if unsafe { environ_cb(retro::ENVIRONMENT_GET_VARIABLE, ptr::addr_of_mut!(var) as _) && var.value != ptr::null() } {
-        match unsafe { *var.value } as u8 {
-            b'1' => unsafe { TESTGL.init_multisample(1) }
-            b'2' => unsafe { TESTGL.init_multisample(2) }
-            b'4' => unsafe { TESTGL.init_multisample(4) }
-            _ => {}
+        if unsafe { environ_cb(retro::ENVIRONMENT_GET_VARIABLE, ptr::addr_of_mut!(var) as _) && var.value != ptr::null() } {
+            match unsafe { *var.value } as u8 {
+                b'1' => unsafe { TESTGL.init_multisample(1) }
+                b'2' => unsafe { TESTGL.init_multisample(2) }
+                b'4' => unsafe { TESTGL.init_multisample(4) }
+                _ => {}
+            }
         }
     }
 }
@@ -193,9 +206,8 @@ fn retro_init_hw_context() -> bool {
     extern "C" fn context_reset() {
         eprintln!("Context reset!");
         unsafe {
-            TESTGL.context_reset(|str| {
-                let cstr = CString::new(str).unwrap();
-                HW_RENDER.get_proc_address.unwrap_unchecked()(cstr.as_ptr())
+            TESTGL.context_reset(|cstr| {
+                mem::transmute(HW_RENDER.get_proc_address.unwrap_unchecked()(cstr.as_ptr()))
             });
         }
     }
@@ -208,9 +220,16 @@ fn retro_init_hw_context() -> bool {
     }
 
     unsafe {
-        HW_RENDER.context_type = retro::HwContextType::OpenGLCore;
-        HW_RENDER.version_major = 3;
-        HW_RENDER.version_minor = 1;
+        #[cfg(feature = "core")]
+        {
+            HW_RENDER.context_type = retro::HwContextType::OpenGLCore;
+            HW_RENDER.version_major = 3;
+            HW_RENDER.version_minor = 1;
+        }
+        #[cfg(not(feature = "core"))]
+        {
+            HW_RENDER.context_type = retro::HwContextType::OpenGL;
+        }
         HW_RENDER.context_reset = Some(context_reset);
         HW_RENDER.context_destroy = Some(context_destroy);
         HW_RENDER.depth = true;

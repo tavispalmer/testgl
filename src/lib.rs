@@ -1,4 +1,4 @@
-use std::{ffi::{c_char, CStr}, mem};
+use std::{ffi::{c_char, c_void, CStr}, mem};
 
 mod ffi;
 mod gl;
@@ -9,12 +9,19 @@ pub struct TestGL {
     height: u32,
     prog: u32,
     vbo: [u32; 1],
+    #[cfg(feature = "core")]
     context_alive: bool,
+    #[cfg(feature = "core")]
     multisample_fbo: bool,
+    #[cfg(feature = "core")]
     multisample: u32,
+    #[cfg(feature = "core")]
     vao: [u32; 1],
+    #[cfg(feature = "core")]
     fbo: [u32; 1],
+    #[cfg(feature = "core")]
     rbo_color: [u32; 1],
+    #[cfg(feature = "core")]
     rbo_depth_stencil: [u32; 1],
     frame_count: u32,
 
@@ -33,12 +40,19 @@ impl TestGL {
             height: Self::BASE_HEIGHT,
             prog: 0,
             vbo: [0],
+            #[cfg(feature = "core")]
             context_alive: false,
+            #[cfg(feature = "core")]
             multisample_fbo: false,
+            #[cfg(feature = "core")]
             multisample: 0,
+            #[cfg(feature = "core")]
             vao: [0],
+            #[cfg(feature = "core")]
             fbo: [0],
+            #[cfg(feature = "core")]
             rbo_color: [0],
+            #[cfg(feature = "core")]
             rbo_depth_stencil: [0],
             frame_count: 0,
             gl: None,
@@ -62,22 +76,51 @@ impl TestGL {
     }
 
     fn compile_program(&mut self) {
-        const VERTEX_SHADER: [*const c_char; 8] = [
-            c"#version 140\nuniform mat4 uMVP;".as_ptr(),
+        #[cfg(feature = "core")]
+        const VERTEX_SHADER: [*const c_char; 9] = [
+            c"#version 140\n".as_ptr(),
+            c"uniform mat4 uMVP;".as_ptr(),
             c"in vec2 aVertex;".as_ptr(),
             c"in vec4 aColor;".as_ptr(),
             c"out vec4 color;".as_ptr(),
             c"void main() {".as_ptr(),
-            c"    gl_Position = uMVP * vec4(aVertex, 0.0, 1.0);".as_ptr(),
-            c"    color = aColor;".as_ptr(),
-            c"}".as_ptr()];
-            
-        const FRAGMENT_SHADER: [*const c_char; 5] = [
-            c"#version 140\nin vec4 color;".as_ptr(),
+            c"  gl_Position = uMVP * vec4(aVertex, 0.0, 1.0);".as_ptr(),
+            c"  color = aColor;".as_ptr(),
+            c"}".as_ptr(),
+        ];
+        
+        #[cfg(feature = "core")]
+        const FRAGMENT_SHADER: [*const c_char; 6] = [
+            c"#version 140\n".as_ptr(),
+            c"in vec4 color;".as_ptr(),
             c"out vec4 FragColor;".as_ptr(),
             c"void main() {".as_ptr(),
-            c"    FragColor = color;".as_ptr(),
-            c"}".as_ptr()];
+            c"  FragColor = color;".as_ptr(),
+            c"}".as_ptr(),
+        ];
+        
+        #[cfg(not(feature = "core"))]
+        const VERTEX_SHADER: [*const c_char; 8] = [
+            c"uniform mat4 uMVP;".as_ptr(),
+            c"attribute vec2 aVertex;".as_ptr(),
+            c"attribute vec4 aColor;".as_ptr(),
+            c"varying vec4 color;".as_ptr(),
+            c"void main() {".as_ptr(),
+            c"  gl_Position = uMVP * vec4(aVertex, 0.0, 1.0);".as_ptr(),
+            c"  color = aColor;".as_ptr(),
+            c"}".as_ptr(),
+        ];
+
+        #[cfg(not(feature = "core"))]
+        const FRAGMENT_SHADER: [*const c_char; 7] = [
+            c"#ifdef GL_ES\n".as_ptr(),
+            c"precision mediump float;\n".as_ptr(),
+            c"#endif\n".as_ptr(),
+            c"varying vec4 color;".as_ptr(),
+            c"void main() {".as_ptr(),
+            c"  gl_FragColor = color;".as_ptr(),
+            c"}".as_ptr(),
+        ];
 
         let gl = self.gl.as_ref().unwrap();
         unsafe {
@@ -98,6 +141,7 @@ impl TestGL {
         }
     }
 
+    #[cfg(feature = "core")]
     pub fn init_multisample(&mut self, samples: u32) {
         self.multisample = samples;
         if !self.context_alive {
@@ -172,6 +216,7 @@ impl TestGL {
         let gl = self.gl.as_ref().unwrap();
 
         unsafe {
+            #[cfg(feature = "core")]
             gl.gen_vertex_arrays(&mut self.vao);
 
             gl.use_program(self.prog);
@@ -189,12 +234,18 @@ impl TestGL {
         let gl = self.gl.as_ref().unwrap();
 
         unsafe {
-            gl.bind_vertex_array(self.vao[0]);
-            if self.multisample_fbo {
-                gl.bind_framebuffer(gl::FRAMEBUFFER, self.fbo[0]);
-            } else {
-                gl.bind_framebuffer(gl::FRAMEBUFFER, framebuffer);
+            #[cfg(feature = "core")]
+            {
+                gl.bind_vertex_array(self.vao[0]);
+                if self.multisample_fbo {
+                    gl.bind_framebuffer(gl::FRAMEBUFFER, self.fbo[0]);
+                } else {
+                    gl.bind_framebuffer(gl::FRAMEBUFFER, framebuffer);
+                }
             }
+
+            #[cfg(not(feature = "core"))]
+            gl.bind_framebuffer(gl::FRAMEBUFFER, framebuffer);
 
             gl.clear_color(0.3, 0.4, 0.5, 1.0);
             gl.viewport(0, 0, self.width as _, self.height as _);
@@ -244,15 +295,18 @@ impl TestGL {
 
             gl.use_program(0);
 
-            gl.bind_vertex_array(0);
-            if self.multisample_fbo {
-                gl.bind_framebuffer(gl::READ_FRAMEBUFFER, self.fbo[0]);
-                gl.bind_framebuffer(gl::DRAW_FRAMEBUFFER, framebuffer);
-                gl.blit_framebuffer(0, 0, self.width as _, self.height as _,
-                    0, 0, self.width as _, self.height as _,
-                    gl::COLOR_BUFFER_BIT, gl::NEAREST);
-                gl.bind_framebuffer(gl::READ_FRAMEBUFFER, 0);
-                gl.bind_framebuffer(gl::DRAW_FRAMEBUFFER, 0);
+            #[cfg(feature = "core")]
+            {
+                gl.bind_vertex_array(0);
+                if self.multisample_fbo {
+                    gl.bind_framebuffer(gl::READ_FRAMEBUFFER, self.fbo[0]);
+                    gl.bind_framebuffer(gl::DRAW_FRAMEBUFFER, framebuffer);
+                    gl.blit_framebuffer(0, 0, self.width as _, self.height as _,
+                        0, 0, self.width as _, self.height as _,
+                        gl::COLOR_BUFFER_BIT, gl::NEAREST);
+                    gl.bind_framebuffer(gl::READ_FRAMEBUFFER, 0);
+                    gl.bind_framebuffer(gl::DRAW_FRAMEBUFFER, 0);
+                }
             }
 
             self.frame_count += 1;
@@ -260,27 +314,32 @@ impl TestGL {
     }
 
     pub fn context_reset<F>(&mut self, get_proc_address: F)
-        where F: FnMut(&str) -> Option<unsafe extern "C" fn()> {
-        self.gl = gl::Context::load(get_proc_address);
+        where F: FnMut(&CStr) -> *const c_void {
+        self.gl = Some(gl::Context::load(get_proc_address));
         self.compile_program();
         self.setup_vao();
-        self.context_alive = true;
-        self.init_multisample(self.multisample);
+        #[cfg(feature = "core")]
+        {
+            self.context_alive = true;
+            self.init_multisample(self.multisample);
+        }
     }
 
     pub fn context_destroy(&mut self) {
         unsafe {
-            self.gl.as_ref().unwrap().delete_vertex_arrays(&self.vao);
-            self.vao[0] = 0;
-            self.init_multisample(0);
-            self.context_alive = false;
+            #[cfg(feature = "core")]
+            {
+                self.gl.as_ref().unwrap().delete_vertex_arrays(&self.vao);
+                self.vao[0] = 0;
+                self.init_multisample(0);
+                self.context_alive = false;
+            }
             let gl = self.gl.as_ref().unwrap();
             gl.delete_buffers(&self.vbo);
             self.vbo[0] = 0;
             gl.delete_program(self.prog);
             self.prog = 0;
         }
-        self.gl = None;
     }
 }
 
