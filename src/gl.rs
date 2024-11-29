@@ -118,6 +118,10 @@ struct FnV2_0 {
 
 impl FnV2_0 {
     pub fn load<F: FnMut(&CStr) -> *const c_void>(mut f: F) -> Self {
+        Self::load_erased(&mut f)
+    }
+    
+    fn load_erased(f: &mut dyn FnMut(&CStr) -> *const c_void) -> Self {
         Self {
             clear_color: unsafe {
                 unsafe extern "system" fn clear_color(_red: GLclampf, _green: GLclampf, _blue: GLclampf, _alpha: GLclampf) {
@@ -416,6 +420,10 @@ struct FnV3_0 {
 
 impl FnV3_0 {
     pub fn load<F: FnMut(&CStr) -> *const c_void>(mut f: F) -> Self {
+        Self::load_erased(&mut f)
+    }
+
+    fn load_erased(f: &mut dyn FnMut(&CStr) -> *const c_void) -> Self {
         Self {
             bind_renderbuffer: unsafe {
                 unsafe extern "system" fn bind_renderbuffer(target: GLenum, renderbuffer: GLuint) {
@@ -570,11 +578,10 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn load<F>(mut get_proc_address: F) -> Self
-        where F: FnMut(&CStr) -> *const c_void {
+    pub fn load<F: FnMut(&CStr) -> *const c_void>(mut f: F) -> Self {
         Self {
-            fn_2_0: FnV2_0::load(&mut get_proc_address),
-            fn_3_0: FnV3_0::load(&mut get_proc_address),
+            fn_2_0: FnV2_0::load(&mut f),
+            fn_3_0: FnV3_0::load(&mut f),
         }
     }
 
