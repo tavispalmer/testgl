@@ -315,6 +315,7 @@ impl TestGL {
 
     pub fn context_reset<F>(&mut self, get_proc_address: F)
         where F: FnMut(&CStr) -> *const c_void {
+        eprintln!("Context reset!");
         self.gl = Some(gl::Context::load(get_proc_address));
         self.compile_program();
         self.setup_vao();
@@ -326,6 +327,7 @@ impl TestGL {
     }
 
     pub fn context_destroy(&mut self) {
+        eprintln!("Context destroy!");
         unsafe {
             #[cfg(feature = "core")]
             {

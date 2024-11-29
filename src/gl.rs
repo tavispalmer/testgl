@@ -615,114 +615,136 @@ impl Context {
         }
     }
 
+    #[inline]
     pub unsafe fn clear_color(&self, red: GLclampf, green: GLclampf, blue: GLclampf, alpha: GLclampf) {
         (self.fn_2_0.clear_color)(red, green, blue, alpha);
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn clear(&self, mask: GLbitfield) {
         (self.fn_2_0.clear)(mask);
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn enable(&self, cap: GLenum) {
         (self.fn_2_0.enable)(cap);
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn get_error(&self) -> GLenum {
         (self.fn_2_0.get_error)()
     }
 
+    #[inline]
     pub unsafe fn viewport(&self, x: GLint, y: GLint, width: GLsizei, height: GLsizei) {
         (self.fn_2_0.viewport)(x, y, width, height);
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn draw_arrays(&self, mode: GLenum, first: GLint, count: GLsizei) {
         (self.fn_2_0.draw_arrays)(mode, first, count);
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn bind_buffer(&self, target: GLenum, buffer: GLuint) {
         (self.fn_2_0.bind_buffer)(target, buffer);
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn delete_buffers(&self, buffers: &[GLuint]) {
         (self.fn_2_0.delete_buffers)(buffers.len() as _, buffers.as_ptr());
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn gen_buffers(&self, buffers: &mut [GLuint]) {
         (self.fn_2_0.gen_buffers)(buffers.len() as _, buffers.as_mut_ptr());
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn buffer_data<T>(&self, target: GLenum, data: &[T], usage: GLenum) {
         (self.fn_2_0.buffer_data)(target, (data.len() * mem::size_of::<T>()) as _, data.as_ptr() as _, usage);
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn attach_shader(&self, program: GLuint, shader: GLuint) {
         (self.fn_2_0.attach_shader)(program, shader);
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn compile_shader(&self, shader: GLuint) {
         (self.fn_2_0.compile_shader)(shader);
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn create_program(&self) -> GLuint {
         let result = (self.fn_2_0.create_program)();
         self.check_error();
         result
     }
 
+    #[inline]
     pub unsafe fn create_shader(&self, type_: GLenum) -> GLuint {
         let result = (self.fn_2_0.create_shader)(type_);
         self.check_error();
         result
     }
 
+    #[inline]
     pub unsafe fn delete_program(&self, program: GLuint) {
         (self.fn_2_0.delete_program)(program);
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn delete_shader(&self, shader: GLuint) {
         (self.fn_2_0.delete_shader)(shader);
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn disable_vertex_attrib_array(&self, index: GLuint) {
         (self.fn_2_0.disable_vertex_attrib_array)(index);
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn enable_vertex_attrib_array(&self, index: GLuint) {
         (self.fn_2_0.enable_vertex_attrib_array)(index);
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn get_attrib_location(&self, program: GLuint, name: &CStr) -> GLint {
         let result = (self.fn_2_0.get_attrib_location)(program, name.as_ptr());
         self.check_error();
         result
     }
 
+    #[inline]
     pub unsafe fn get_uniform_location(&self, program: GLuint, name: &CStr) -> GLint {
         let result = (self.fn_2_0.get_uniform_location)(program, name.as_ptr());
         self.check_error();
         result
     }
 
+    #[inline]
     pub unsafe fn link_program(&self, program: GLuint) {
         (self.fn_2_0.link_program)(program);
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn shader_source(&self, shader: GLuint, string: &[*const GLchar], length: Option<&[GLint]>) {
         #[cfg(debug_assertions)]
         if let Some(length) = length {
@@ -732,82 +754,98 @@ impl Context {
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn use_program(&self, program: GLuint) {
         (self.fn_2_0.use_program)(program);
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn uniform_matrix_4fv(&self, location: GLint, count: GLsizei, transpose: bool, value: &[GLfloat]) {
         (self.fn_2_0.uniform_matrix_4fv)(location, count, if transpose { TRUE } else { FALSE }, value.as_ptr());
         self.check_error();
     }
 
-    pub unsafe fn vertex_attrib_pointer(&self, index: GLuint, size: usize, type_: GLenum, normalized: bool, stride: usize, pointer: usize) {
-        (self.fn_2_0.vertex_attrib_pointer)(index, size as _, type_, if normalized { TRUE } else { FALSE }, stride as _, pointer as _);
+    #[inline]
+    pub unsafe fn vertex_attrib_pointer(&self, index: GLuint, size: GLint, type_: GLenum, normalized: bool, stride: GLsizei, pointer: usize) {
+        (self.fn_2_0.vertex_attrib_pointer)(index, size, type_, if normalized { TRUE } else { FALSE }, stride, pointer as _);
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn bind_renderbuffer(&self, target: GLenum, renderbuffer: GLuint) {
         (self.fn_3_0.bind_renderbuffer)(target, renderbuffer);
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn delete_renderbuffers(&self, renderbuffers: &[GLuint]) {
         (self.fn_3_0.delete_renderbuffers)(renderbuffers.len() as _, renderbuffers.as_ptr());
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn gen_renderbuffers(&self, renderbuffers: &mut [GLuint]) {
         (self.fn_3_0.gen_renderbuffers)(renderbuffers.len() as _, renderbuffers.as_mut_ptr());
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn bind_framebuffer(&self, target: GLenum, framebuffer: GLuint) {
         (self.fn_3_0.bind_framebuffer)(target, framebuffer);
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn delete_framebuffers(&self, framebuffers: &[GLuint]) {
         (self.fn_3_0.delete_framebuffers)(framebuffers.len() as _, framebuffers.as_ptr());
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn gen_framebuffers(&self, framebuffers: &mut [GLuint]) {
         (self.fn_3_0.gen_framebuffers)(framebuffers.len() as _, framebuffers.as_mut_ptr());
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn check_framebuffer_status(&self, target: GLenum) -> GLenum {
         let result = (self.fn_3_0.check_framebuffer_status)(target);
         self.check_error();
         result
     }
 
+    #[inline]
     pub unsafe fn framebuffer_renderbuffer(&self, target: GLenum, attachment: GLenum, renderbuffertarget: GLenum, renderbuffer: GLuint) {
         (self.fn_3_0.framebuffer_renderbuffer)(target, attachment, renderbuffertarget, renderbuffer);
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn blit_framebuffer(&self, srcX0: GLint, srcY0: GLint, srcX1: GLint, srcY1: GLint, dstX0: GLint, dstY0: GLint, dstX1: GLint, dstY1: GLint, mask: GLbitfield, filter: GLenum) {
         (self.fn_3_0.blit_framebuffer)(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn renderbuffer_storage_multisample(&self, target: GLenum, samples: GLsizei, internalformat: GLenum, width: GLsizei, height: GLsizei) {
         (self.fn_3_0.renderbuffer_storage_multisample)(target, samples, internalformat, width, height);
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn bind_vertex_array(&self, array: GLuint) {
         (self.fn_3_0.bind_vertex_array)(array);
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn delete_vertex_arrays(&self, arrays: &[GLuint]) {
         (self.fn_3_0.delete_vertex_arrays)(arrays.len() as _, arrays.as_ptr());
         self.check_error();
     }
 
+    #[inline]
     pub unsafe fn gen_vertex_arrays(&self, arrays: &mut [GLuint]) {
         (self.fn_3_0.gen_vertex_arrays)(arrays.len() as _, arrays.as_mut_ptr());
         self.check_error();

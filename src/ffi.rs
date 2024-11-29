@@ -204,7 +204,6 @@ fn retro_init_hw_context() -> bool {
     let environ_cb = unsafe { ENVIRON_CB.unwrap_unchecked() };
 
     extern "C" fn context_reset() {
-        eprintln!("Context reset!");
         unsafe {
             TESTGL.context_reset(|cstr| {
                 mem::transmute(HW_RENDER.get_proc_address.unwrap_unchecked()(cstr.as_ptr()))
@@ -213,7 +212,6 @@ fn retro_init_hw_context() -> bool {
     }
 
     extern "C" fn context_destroy() {
-        eprintln!("Context destroy!");
         unsafe {
             TESTGL.context_destroy();
         }
