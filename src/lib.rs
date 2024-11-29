@@ -15,7 +15,7 @@ pub struct TestGL {
     vao: [u32; 1],
     fbo: [u32; 1],
     rbo_color: [u32; 1],
-    rbo_depth_stencil:[u32; 1],
+    rbo_depth_stencil: [u32; 1],
     frame_count: u32,
 
     gl: Option<gl::Context>,
@@ -61,34 +61,32 @@ impl TestGL {
         self.height = height;
     }
 
-    const VERTEX_SHADER: [*const c_char; 1] = [
-c"#version 140
-uniform mat4 uMVP;
-in vec2 aVertex;
-in vec4 aColor;
-out vec4 color;
-void main() {
-    gl_Position = uMVP * vec4(aVertex, 0.0, 1.0);
-    color = aColor;
-}".as_ptr()];
-
-    const FRAGMENT_SHADER: [*const c_char; 1] = [
-c"#version 140
-in vec4 color;
-out vec4 FragColor;
-void main() {
-    FragColor = color;
-}".as_ptr()];
-
     fn compile_program(&mut self) {
+        const VERTEX_SHADER: [*const c_char; 8] = [
+            c"#version 140\nuniform mat4 uMVP;".as_ptr(),
+            c"in vec2 aVertex;".as_ptr(),
+            c"in vec4 aColor;".as_ptr(),
+            c"out vec4 color;".as_ptr(),
+            c"void main() {".as_ptr(),
+            c"    gl_Position = uMVP * vec4(aVertex, 0.0, 1.0);".as_ptr(),
+            c"    color = aColor;".as_ptr(),
+            c"}".as_ptr()];
+            
+        const FRAGMENT_SHADER: [*const c_char; 5] = [
+            c"#version 140\nin vec4 color;".as_ptr(),
+            c"out vec4 FragColor;".as_ptr(),
+            c"void main() {".as_ptr(),
+            c"    FragColor = color;".as_ptr(),
+            c"}".as_ptr()];
+
         let gl = self.gl.as_ref().unwrap();
         unsafe {
             self.prog = gl.create_program();
             let vert = gl.create_shader(gl::VERTEX_SHADER);
             let frag = gl.create_shader(gl::FRAGMENT_SHADER);
 
-            gl.shader_source(vert, &Self::VERTEX_SHADER, None);
-            gl.shader_source(frag, &Self::FRAGMENT_SHADER, None);
+            gl.shader_source(vert, &VERTEX_SHADER, None);
+            gl.shader_source(frag, &FRAGMENT_SHADER, None);
             gl.compile_shader(vert);
             gl.compile_shader(frag);
 
@@ -160,8 +158,6 @@ void main() {
     }
 
     fn setup_vao(&mut self) {
-        let gl = self.gl.as_ref().unwrap();
-
         const VERTEX_DATA: [f32; 24] = [
             -0.5, -0.5,
             0.5, -0.5,
@@ -172,6 +168,8 @@ void main() {
             0.0, 1.0, 1.0, 1.0,
             1.0, 0.0, 1.0, 1.0,
         ];
+
+        let gl = self.gl.as_ref().unwrap();
 
         unsafe {
             gl.gen_vertex_arrays(&mut self.vao);

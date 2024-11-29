@@ -145,7 +145,6 @@ fn update_variables() {
 
     if unsafe { environ_cb(retro::ENVIRONMENT_GET_VARIABLE, ptr::addr_of_mut!(var) as _) && var.value != ptr::null() } {
         match unsafe { *var.value } as u8 {
-            // todo
             b'1' => unsafe { TESTGL.init_multisample(1) }
             b'2' => unsafe { TESTGL.init_multisample(2) }
             b'4' => unsafe { TESTGL.init_multisample(4) }
