@@ -1,5 +1,3 @@
-use std::mem;
-
 use glfw::Context;
 use testgl::TestGL;
 

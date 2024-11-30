@@ -1,6 +1,6 @@
 #![allow(non_snake_case)]
 
-use std::{ffi::*, mem, ptr::null};
+use std::{ffi::*, mem, ptr};
 
 pub type GLenum = u32;
 pub type GLboolean = u8;
@@ -750,7 +750,7 @@ impl Context {
         if let Some(length) = length {
             assert_eq!(string.len(), length.len());
         }
-        (self.fn_2_0.shader_source)(shader, string.len() as _, string.as_ptr(), if let Some(length) = length { length.as_ptr() } else { null() });
+        (self.fn_2_0.shader_source)(shader, string.len() as _, string.as_ptr(), if let Some(length) = length { length.as_ptr() } else { ptr::null() });
         self.check_error();
     }
 

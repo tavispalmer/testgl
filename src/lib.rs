@@ -342,6 +342,7 @@ impl TestGL {
             gl.delete_program(self.prog);
             self.prog = 0;
         }
+        self.gl = None;
     }
 }
 
