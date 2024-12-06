@@ -1,13 +1,13 @@
 // libretro interface
 
-use std::{ffi::{c_char, c_uint, c_void, CStr}, mem, ptr};
+use std::{ffi::{c_char, c_uint, c_void, CStr}, marker::PhantomData, mem, ptr};
 
 use crate::{retro, TestGL};
 
 static mut TESTGL: TestGL = TestGL::new();
 
-static mut HW_RENDER: retro::HwRenderCallback = retro::HwRenderCallback {
-    context_type: retro::HwContextType::None,
+static mut HW_RENDER: retro::hw_render_callback = retro::hw_render_callback {
+    context_type: retro::hw_context_type::NONE,
     context_reset: None,
     get_current_framebuffer: None,
     get_proc_address: None,
@@ -21,67 +21,70 @@ static mut HW_RENDER: retro::HwRenderCallback = retro::HwRenderCallback {
     debug_context: false,
 };
 
-static mut VIDEO_CB: retro::VideoRefresh = {
+static mut VIDEO_CB: retro::video_refresh_t = {
     unsafe extern "C" fn cb(_data: *const c_void, _width: c_uint, _height: c_uint, _pitch: usize) {
         panic!(concat!("Unable to load ", stringify!(VIDEO_CB)))
     }
     cb
 };
-static mut AUDIO_CB: retro::AudioSample = {
-    unsafe extern "C" fn cb(left: i16, right: i16) {
+static mut AUDIO_CB: retro::audio_sample_t = {
+    unsafe extern "C" fn cb(_left: i16, _right: i16) {
         panic!(concat!("Unable to load ", stringify!(AUDIO_CB)))
     }
     cb
 };
-static mut AUDIO_BATCH_CB: retro::AudioSampleBatch = {
-    unsafe extern "C" fn cb(data: *const i16, frames: usize) -> usize {
+static mut AUDIO_BATCH_CB: retro::audio_sample_batch_t = {
+    unsafe extern "C" fn cb(_data: *const i16, _frames: usize) -> usize {
         panic!(concat!("Unable to load ", stringify!(AUDIO_BATCH_CB)))
     }
     cb
 };
-static mut ENVIRON_CB: retro::Environment = {
-    unsafe extern "C" fn cb(cmd: c_uint, data: *mut c_void) -> bool {
+static mut ENVIRON_CB: retro::environment_t = {
+    unsafe extern "C" fn cb(_cmd: c_uint, _data: *mut c_void) -> bool {
         panic!(concat!("Unable to load ", stringify!(ENVIRON_CB)))
     }
     cb
 };
-static mut INPUT_POLL_CB: retro::InputPoll = {
+static mut INPUT_POLL_CB: retro::input_poll_t = {
     unsafe extern "C" fn cb() {
         panic!(concat!("Unable to load ", stringify!(INPUT_POLL_CB)))
     }
     cb
 };
-static mut INPUT_STATE_CB: retro::InputState = {
-    unsafe extern "C" fn cb(port: c_uint, device: c_uint, index: c_uint, id: c_uint) -> i16 {
+static mut INPUT_STATE_CB: retro::input_state_t = {
+    unsafe extern "C" fn cb(_port: c_uint, _device: c_uint, _index: c_uint, _id: c_uint) -> i16 {
         panic!(concat!("Unable to load ", stringify!(INPUT_STATE_CB)))
     }
     cb
 };
 
 #[no_mangle]
-pub extern "C" fn retro_set_environment(cb: retro::Environment) {
+pub extern "C" fn retro_set_environment(cb: retro::environment_t) {
     unsafe { ENVIRON_CB = cb };
 
     #[cfg(feature = "core")]
-    const VARIABLES: [retro::Variable; 3] = [
-        retro::Variable {
+    const VARIABLES: [retro::variable; 3] = [
+        retro::variable {
             key: c"testgl_resolution".as_ptr(),
             value: c"Internal resolution; 320x240|360x480|480x272|512x384|512x512|640x240|640x448|640x480|720x576|800x600|960x720|1024x768|1024x1024|1280x720|1280x960|1600x1200|1920x1080|1920x1440|1920x1600|2048x2048".as_ptr(),
+            _marker: PhantomData,
         },
-        retro::Variable {
+        retro::variable {
             key: c"testgl_multisample".as_ptr(),
             value: c"Multisampling; 1x|2x|4x".as_ptr(),
+            _marker: PhantomData,
         },
-        retro::Variable { key: ptr::null(), value: ptr::null() },
+        retro::variable { key: ptr::null(), value: ptr::null(), _marker: PhantomData },
     ];
 
     #[cfg(not(feature = "core"))]
-    const VARIABLES: [retro::Variable; 2] = [
-        retro::Variable {
+    const VARIABLES: [retro::variable; 2] = [
+        retro::variable {
             key: c"testgl_resolution".as_ptr(),
             value: c"Internal resolution; 320x240|360x480|480x272|512x384|512x512|640x240|640x448|640x480|720x576|800x600|960x720|1024x768|1024x1024|1280x720|1280x960|1600x1200|1920x1080|1920x1440|1920x1600|2048x2048".as_ptr(),
+            _marker: PhantomData,
         },
-        retro::Variable { key: ptr::null(), value: ptr::null() },
+        retro::variable { key: ptr::null(), value: ptr::null(), _marker: PhantomData },
     ];
 
     let no_rom = true;
@@ -92,27 +95,27 @@ pub extern "C" fn retro_set_environment(cb: retro::Environment) {
 }
 
 #[no_mangle]
-pub extern "C" fn retro_set_video_refresh(cb: retro::VideoRefresh) {
+pub extern "C" fn retro_set_video_refresh(cb: retro::video_refresh_t) {
     unsafe { VIDEO_CB = cb };
 }
 
 #[no_mangle]
-pub extern "C" fn retro_set_audio_sample(cb: retro::AudioSample) {
+pub extern "C" fn retro_set_audio_sample(cb: retro::audio_sample_t) {
     unsafe { AUDIO_CB = cb };
 }
 
 #[no_mangle]
-pub extern "C" fn retro_set_audio_sample_batch(cb: retro::AudioSampleBatch) {
+pub extern "C" fn retro_set_audio_sample_batch(cb: retro::audio_sample_batch_t) {
     unsafe { AUDIO_BATCH_CB = cb };
 }
 
 #[no_mangle]
-pub extern "C" fn retro_set_input_poll(cb: retro::InputPoll) {
+pub extern "C" fn retro_set_input_poll(cb: retro::input_poll_t) {
     unsafe { INPUT_POLL_CB = cb };
 }
 
 #[no_mangle]
-pub extern "C" fn retro_set_input_state(cb: retro::InputState) {
+pub extern "C" fn retro_set_input_state(cb: retro::input_state_t) {
     unsafe { INPUT_STATE_CB = cb };
 }
 
@@ -128,21 +131,21 @@ pub extern "C" fn retro_api_version() -> c_uint {
 }
 
 #[no_mangle]
-pub extern "C" fn retro_get_system_info(info: *mut retro::SystemInfo) {
+pub extern "C" fn retro_get_system_info(info: *mut retro::system_info) {
     unsafe {
-        *info = retro::SystemInfo::default()
+        *info = retro::system_info::default()
             .library_name(c"TestCore GL")
             .library_version(c"v1");
     }
 }
 
 #[no_mangle]
-pub extern "C" fn retro_get_system_av_info(info: *mut retro::SystemAvInfo) {
+pub extern "C" fn retro_get_system_av_info(info: *mut retro::system_av_info) {
     unsafe {
-        *info = retro::SystemAvInfo::default()
-            .timing(retro::SystemTiming::default()
+        *info = retro::system_av_info::default()
+            .timing(retro::system_timing::default()
                 .fps(60.0))
-            .geometry(retro::GameGeometry::default()
+            .geometry(retro::game_geometry::default()
                 .base_width(TestGL::BASE_WIDTH)
                 .base_height(TestGL::BASE_HEIGHT)
                 .max_width(TestGL::MAX_WIDTH)
@@ -152,13 +155,13 @@ pub extern "C" fn retro_get_system_av_info(info: *mut retro::SystemAvInfo) {
 }
 
 #[no_mangle]
-pub extern "C" fn retro_set_controller_port_device(port: c_uint, device: c_uint) {}
+pub extern "C" fn retro_set_controller_port_device(_port: c_uint, _device: c_uint) {}
 
 #[no_mangle]
 pub extern "C" fn retro_reset() {}
 
 fn update_variables() {
-    let mut var = retro::Variable::default()
+    let mut var = retro::variable::default()
         .key(c"testgl_resolution");
 
     if unsafe { ENVIRON_CB(retro::ENVIRONMENT_GET_VARIABLE, ptr::addr_of_mut!(var) as _) && var.value != ptr::null() } {
@@ -174,7 +177,7 @@ fn update_variables() {
 
     #[cfg(feature = "core")]
     {
-        var = retro::Variable::default()
+        var = retro::variable::default()
             .key(c"testgl_multisample");
 
         if unsafe { ENVIRON_CB(retro::ENVIRONMENT_GET_VARIABLE, ptr::addr_of_mut!(var) as _) && var.value != ptr::null() } {
@@ -206,17 +209,16 @@ pub extern "C" fn retro_run() {
 pub extern "C" fn retro_serialize_size() -> usize { 0 }
 
 #[no_mangle]
-pub extern "C" fn retro_serialize(data: *mut c_void, size: usize) -> bool { false }
+pub extern "C" fn retro_serialize(_data: *mut c_void, _size: usize) -> bool { false }
 
 #[no_mangle]
-pub extern "C" fn retro_unserialize(data: *const c_void, size: usize) -> bool { false }
+pub extern "C" fn retro_unserialize(_data: *const c_void, _size: usize) -> bool { false }
 
 #[no_mangle]
 pub extern "C" fn retro_cheat_reset() {}
 
 #[no_mangle]
-pub extern "C" fn retro_cheat_set(index: c_uint, enabled: bool, code: *const c_char) {}
-
+pub extern "C" fn retro_cheat_set(_index: c_uint, _enabled: bool, _code: *const c_char) {}
 
 fn retro_init_hw_context() -> bool {
     extern "C" fn context_reset() {
@@ -236,13 +238,13 @@ fn retro_init_hw_context() -> bool {
     unsafe {
         #[cfg(feature = "core")]
         {
-            HW_RENDER.context_type = retro::HwContextType::OpenGLCore;
+            HW_RENDER.context_type = retro::hw_context_type::OPENGL_CORE;
             HW_RENDER.version_major = 3;
             HW_RENDER.version_minor = 1;
         }
         #[cfg(not(feature = "core"))]
         {
-            HW_RENDER.context_type = retro::HwContextType::OpenGL;
+            HW_RENDER.context_type = retro::hw_context_type::OPENGL;
         }
         HW_RENDER.context_reset = Some(context_reset);
         HW_RENDER.context_destroy = Some(context_destroy);
@@ -259,7 +261,7 @@ fn retro_init_hw_context() -> bool {
 }
 
 #[no_mangle]
-pub extern "C" fn retro_load_game(info: *const retro::GameInfo) -> bool {
+pub extern "C" fn retro_load_game(_info: *const retro::game_info) -> bool {
     update_variables();
 
     let fmt = retro::PixelFormat::XRGB8888;
@@ -278,7 +280,7 @@ pub extern "C" fn retro_load_game(info: *const retro::GameInfo) -> bool {
 }
 
 #[no_mangle]
-pub extern "C" fn retro_load_game_special(type_: c_uint, info: *const retro::GameInfo, num: usize) -> bool { false }
+pub extern "C" fn retro_load_game_special(_type: c_uint, _info: *const retro::game_info, _num: usize) -> bool { false }
 
 #[no_mangle]
 pub extern "C" fn retro_unload_game() {}
@@ -287,7 +289,7 @@ pub extern "C" fn retro_unload_game() {}
 pub extern "C" fn retro_get_region() -> c_uint { retro::REGION_NTSC }
 
 #[no_mangle]
-pub extern "C" fn retro_get_memory_data(id: c_uint) -> *mut c_void { ptr::null_mut() }
+pub extern "C" fn retro_get_memory_data(_id: c_uint) -> *mut c_void { ptr::null_mut() }
 
 #[no_mangle]
-pub extern "C" fn retro_get_memory_size(id: c_uint) -> usize { 0 }
+pub extern "C" fn retro_get_memory_size(_id: c_uint) -> usize { 0 }

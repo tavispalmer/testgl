@@ -1,4 +1,6 @@
-use std::{ffi::{c_char, c_int, c_uint, c_void, CStr}, ptr};
+#![allow(non_camel_case_types)]
+
+use std::{ffi::{c_char, c_int, c_uint, c_void, CStr}, marker::PhantomData, ptr};
 
 pub const API_VERSION: c_uint = 1;  // 97
 
@@ -11,83 +13,84 @@ pub const ENVIRONMENT_SET_VARIABLES: c_uint = 16;
 pub const ENVIRONMENT_GET_VARIABLE_UPDATE: c_uint = 17;
 pub const ENVIRONMENT_SET_SUPPORT_NO_GAME: c_uint = 18;
 
-pub type ProcAddress = Option<unsafe extern "C" fn()>;
+pub type proc_address_t = Option<unsafe extern "C" fn()>;
 
 pub const HW_FRAME_BUFFER_VALID: *const c_void = -1 as isize as _;
 
-pub type HwContextReset = Option<unsafe extern "C" fn()>;
-pub type HwGetCurrentFramebuffer = Option<unsafe extern "C" fn() -> usize>;
-pub type HwGetProcAddress = Option<unsafe extern "C" fn(sym: *const c_char) -> ProcAddress>;
+pub type hw_context_reset_t = Option<unsafe extern "C" fn()>;
+pub type hw_get_current_framebuffer_t = Option<unsafe extern "C" fn() -> usize>;
+pub type hw_get_proc_address_t = Option<unsafe extern "C" fn(sym: *const c_char) -> proc_address_t>;
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub enum HwContextType {
-    None = 0,
-    OpenGL = 1,
-    OpenGLES2 = 2,
-    OpenGLCore = 3,
-    OpenGLES3 = 4,
-    OpenGLESVersion = 5,
-    Vulkan = 6,
+pub enum hw_context_type {
+    NONE = 0,
+    OPENGL = 1,
+    OPENGLES2 = 2,
+    OPENGL_CORE = 3,
+    OPENGLES3 = 4,
+    OPENGLES_VERSION = 5,
+    VULKAN = 6,
     D3D11 = 7,
     D3D10 = 8,
     D3D12 = 9,
     D3D9 = 10,
-    Dummy = c_int::MAX as isize,
+    DUMMY = c_int::MAX as isize,
 }
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct HwRenderCallback {
-    pub context_type: HwContextType,
-    pub context_reset: HwContextReset,
-    pub get_current_framebuffer: HwGetCurrentFramebuffer,
-    pub get_proc_address: HwGetProcAddress,
+pub struct hw_render_callback {
+    pub context_type: hw_context_type,
+    pub context_reset: hw_context_reset_t,
+    pub get_current_framebuffer: hw_get_current_framebuffer_t,
+    pub get_proc_address: hw_get_proc_address_t,
     pub depth: bool,
     pub stencil: bool,
     pub bottom_left_origin: bool,
     pub version_major: c_uint,
     pub version_minor: c_uint,
     pub cache_context: bool,
-    pub context_destroy: HwContextReset,
+    pub context_destroy: hw_context_reset_t,
     pub debug_context: bool,
 }
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 pub enum PixelFormat {
-    _0RGB1555 = 0,
+    TYPE_0RGB1555 = 0,
     XRGB8888 = 1,
     RGB565 = 2,
-    Unknown = c_int::MAX as isize,
+    UNKNOWN = c_int::MAX as isize,
 }
 
 // 5966
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct SystemInfo {
+pub struct system_info<'a> {
     pub library_name: *const c_char,
     pub library_version: *const c_char,
     pub valid_extensions: *const c_char,
     pub need_fullpath: bool,
     pub block_extract: bool,
+    pub _marker: PhantomData<&'a ()>,
 }
 
-impl SystemInfo {
+impl<'a> system_info<'a> {
     #[inline]
-    pub fn library_name(mut self, library_name: &CStr) -> Self {
+    pub fn library_name(mut self, library_name: &'a CStr) -> Self {
         self.library_name = library_name.as_ptr();
         self
     }
 
     #[inline]
-    pub fn library_version(mut self, library_version: &CStr) -> Self {
+    pub fn library_version(mut self, library_version: &'a CStr) -> Self {
         self.library_version = library_version.as_ptr();
         self
     }
 
     #[inline]
-    pub fn valid_extensions(mut self, valid_extensions: &CStr) -> Self {
+    pub fn valid_extensions(mut self, valid_extensions: &'a CStr) -> Self {
         self.valid_extensions = valid_extensions.as_ptr();
         self
     }
@@ -105,7 +108,7 @@ impl SystemInfo {
     }
 }
 
-impl Default for SystemInfo {
+impl Default for system_info<'_> {
     fn default() -> Self {
         Self {
             library_name: ptr::null(),
@@ -113,13 +116,14 @@ impl Default for SystemInfo {
             valid_extensions: ptr::null(),
             need_fullpath: false,
             block_extract: false,
+            _marker: PhantomData,
         }
     }
 }
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct GameGeometry {
+pub struct game_geometry {
     pub base_width: c_uint,
     pub base_height: c_uint,
     pub max_width: c_uint,
@@ -127,7 +131,7 @@ pub struct GameGeometry {
     pub aspect_ratio: f32,
 }
 
-impl GameGeometry {
+impl game_geometry {
     #[inline]
     pub fn base_width(mut self, base_width: c_uint) -> Self {
         self.base_width = base_width;
@@ -159,7 +163,7 @@ impl GameGeometry {
     }
 }
 
-impl Default for GameGeometry {
+impl Default for game_geometry {
     fn default() -> Self {
         Self {
             base_width: 0,
@@ -173,12 +177,12 @@ impl Default for GameGeometry {
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct SystemTiming {
+pub struct system_timing {
     pub fps: f64,
     pub sample_rate: f64,
 }
 
-impl SystemTiming {
+impl system_timing {
     #[inline]
     pub fn fps(mut self, fps: f64) -> Self {
         self.fps = fps;
@@ -192,7 +196,7 @@ impl SystemTiming {
     }
 }
 
-impl Default for SystemTiming {
+impl Default for system_timing {
     fn default() -> Self {
         Self {
             fps: 0.0,
@@ -203,76 +207,78 @@ impl Default for SystemTiming {
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct SystemAvInfo {
-    pub geometry: GameGeometry,
-    pub timing: SystemTiming,
+pub struct system_av_info {
+    pub geometry: game_geometry,
+    pub timing: system_timing,
 }
 
-impl SystemAvInfo {
+impl system_av_info {
     #[inline]
-    pub fn geometry(mut self, geometry: GameGeometry) -> Self {
+    pub fn geometry(mut self, geometry: game_geometry) -> Self {
         self.geometry = geometry;
         self
     }
 
     #[inline]
-    pub fn timing(mut self, timing: SystemTiming) -> Self {
+    pub fn timing(mut self, timing: system_timing) -> Self {
         self.timing = timing;
         self
     }
 }
 
-impl Default for SystemAvInfo {
+impl Default for system_av_info {
     fn default() -> Self {
         Self {
-            geometry: GameGeometry::default(),
-            timing: SystemTiming::default(),
+            geometry: game_geometry::default(),
+            timing: system_timing::default(),
         }
     }
 }
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct Variable {
+pub struct variable<'a> {
     pub key: *const c_char,
     pub value: *const c_char,
+    pub _marker: PhantomData<&'a ()>,
 }
 
-impl Variable {
+impl<'a> variable<'a> {
     #[inline]
-    pub fn key(mut self, key: &CStr) -> Self {
+    pub fn key(mut self, key: &'a CStr) -> Self {
         self.key = key.as_ptr();
         self
     }
 
     #[inline]
-    pub fn value(mut self, value: &CStr) -> Self {
+    pub fn value(mut self, value: &'a CStr) -> Self {
         self.value = value.as_ptr();
         self
     }
 }
 
-impl Default for Variable {
+impl Default for variable<'_> {
     fn default() -> Self {
         Self {
             key: ptr::null(),
             value: ptr::null(),
+            _marker: PhantomData,
         }
     }
 }
 
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
-pub struct GameInfo {
+pub struct game_info {
     pub path: *const c_char,
     pub data: *const c_void,
     pub size: usize,
     pub meta: *const c_char,
 }
 
-pub type Environment = unsafe extern "C" fn(cmd: c_uint, data: *mut c_void) -> bool;
-pub type VideoRefresh = unsafe extern "C" fn(data: *const c_void, width: c_uint, height: c_uint, pitch: usize);
-pub type AudioSample = unsafe extern "C" fn(left: i16, right: i16);
-pub type AudioSampleBatch = unsafe extern "C" fn(data: *const i16, frames: usize) -> usize;
-pub type InputPoll = unsafe extern "C" fn();
-pub type InputState = unsafe extern "C" fn(port: c_uint, device: c_uint, index: c_uint, id: c_uint) -> i16;
+pub type environment_t = unsafe extern "C" fn(cmd: c_uint, data: *mut c_void) -> bool;
+pub type video_refresh_t = unsafe extern "C" fn(data: *const c_void, width: c_uint, height: c_uint, pitch: usize);
+pub type audio_sample_t = unsafe extern "C" fn(left: i16, right: i16);
+pub type audio_sample_batch_t = unsafe extern "C" fn(data: *const i16, frames: usize) -> usize;
+pub type input_poll_t = unsafe extern "C" fn();
+pub type input_state_t = unsafe extern "C" fn(port: c_uint, device: c_uint, index: c_uint, id: c_uint) -> i16;

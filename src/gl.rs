@@ -1,6 +1,10 @@
+// opengl bindings based on ash
+
 #![allow(non_snake_case)]
 
 use std::{ffi::*, mem, ptr};
+
+// gl.h
 
 pub type GLenum = u32;
 pub type GLboolean = u8;
@@ -223,7 +227,7 @@ impl FnV2_0 {
                 }
             },
             buffer_data: unsafe {
-                unsafe extern "system" fn buffer_data(target: GLenum, size: GLsizeiptr, data: *const c_void, usage: GLenum) {
+                unsafe extern "system" fn buffer_data(_target: GLenum, _size: GLsizeiptr, _data: *const c_void, _usage: GLenum) {
                     panic!(concat!("Unable to load ", stringify!(buffer_data)))
                 }
                 let val = f(c"glBufferData");
@@ -234,7 +238,7 @@ impl FnV2_0 {
                 }
             },
             attach_shader: unsafe {
-                unsafe extern "system" fn attach_shader(program: GLuint, shader: GLuint) {
+                unsafe extern "system" fn attach_shader(_program: GLuint, _shader: GLuint) {
                     panic!(concat!("Unable to load ", stringify!(attach_shader)))
                 }
                 let val = f(c"glAttachShader");
@@ -245,7 +249,7 @@ impl FnV2_0 {
                 }
             },
             compile_shader: unsafe {
-                unsafe extern "system" fn compile_shader(shader: GLuint) {
+                unsafe extern "system" fn compile_shader(_shader: GLuint) {
                     panic!(concat!("Unable to load ", stringify!(compile_shader)))
                 }
                 let val = f(c"glCompileShader");
@@ -267,7 +271,7 @@ impl FnV2_0 {
                 }
             },
             create_shader: unsafe {
-                unsafe extern "system" fn create_shader(type_: GLenum) -> GLuint {
+                unsafe extern "system" fn create_shader(_type: GLenum) -> GLuint {
                     panic!(concat!("Unable to load ", stringify!(create_shader)))
                 }
                 let val = f(c"glCreateShader");
@@ -278,7 +282,7 @@ impl FnV2_0 {
                 }
             },
             delete_program: unsafe {
-                unsafe extern "system" fn delete_program(program: GLuint) {
+                unsafe extern "system" fn delete_program(_program: GLuint) {
                     panic!(concat!("Unable to load ", stringify!(delete_program)))
                 }
                 let val = f(c"glDeleteProgram");
@@ -289,7 +293,7 @@ impl FnV2_0 {
                 }
             },
             delete_shader: unsafe {
-                unsafe extern "system" fn delete_shader(shader: GLuint) {
+                unsafe extern "system" fn delete_shader(_shader: GLuint) {
                     panic!(concat!("Unable to load ", stringify!(delete_shader)))
                 }
                 let val = f(c"glDeleteShader");
@@ -300,7 +304,7 @@ impl FnV2_0 {
                 }
             },
             disable_vertex_attrib_array: unsafe {
-                unsafe extern "system" fn disable_vertex_attrib_array(index: GLuint) {
+                unsafe extern "system" fn disable_vertex_attrib_array(_index: GLuint) {
                     panic!(concat!("Unable to load ", stringify!(disable_vertex_attrib_array)))
                 }
                 let val = f(c"glDisableVertexAttribArray");
@@ -311,7 +315,7 @@ impl FnV2_0 {
                 }
             },
             enable_vertex_attrib_array: unsafe {
-                unsafe extern "system" fn enable_vertex_attrib_array(index: GLuint) {
+                unsafe extern "system" fn enable_vertex_attrib_array(_index: GLuint) {
                     panic!(concat!("Unable to load ", stringify!(enable_vertex_attrib_array)))
                 }
                 let val = f(c"glEnableVertexAttribArray");
@@ -322,7 +326,7 @@ impl FnV2_0 {
                 }
             },
             get_attrib_location: unsafe {
-                unsafe extern "system" fn get_attrib_location(program: GLuint, name: *const GLchar) -> GLint {
+                unsafe extern "system" fn get_attrib_location(_program: GLuint, _name: *const GLchar) -> GLint {
                     panic!(concat!("Unable to load ", stringify!(get_attrib_location)))
                 }
                 let val = f(c"glGetAttribLocation");
@@ -333,7 +337,7 @@ impl FnV2_0 {
                 }
             },
             get_uniform_location: unsafe {
-                unsafe extern "system" fn get_uniform_location(program: GLuint, name: *const GLchar) -> GLint {
+                unsafe extern "system" fn get_uniform_location(_program: GLuint, _name: *const GLchar) -> GLint {
                     panic!(concat!("Unable to load ", stringify!(get_uniform_location)))
                 }
                 let val = f(c"glGetUniformLocation");
@@ -344,7 +348,7 @@ impl FnV2_0 {
                 }
             },
             link_program: unsafe {
-                unsafe extern "system" fn link_program(program: GLuint) {
+                unsafe extern "system" fn link_program(_program: GLuint) {
                     panic!(concat!("Unable to load ", stringify!(link_program)))
                 }
                 let val = f(c"glLinkProgram");
@@ -355,7 +359,7 @@ impl FnV2_0 {
                 }
             },
             shader_source: unsafe {
-                unsafe extern "system" fn shader_source(shader: GLuint, count: GLsizei, string: *const *const GLchar, length: *const GLint) {
+                unsafe extern "system" fn shader_source(_shader: GLuint, _count: GLsizei, _string: *const *const GLchar, _length: *const GLint) {
                     panic!(concat!("Unable to load ", stringify!(shader_source)))
                 }
                 let val = f(c"glShaderSource");
@@ -366,7 +370,7 @@ impl FnV2_0 {
                 }
             },
             use_program: unsafe {
-                unsafe extern "system" fn use_program(program: GLuint) {
+                unsafe extern "system" fn use_program(_program: GLuint) {
                     panic!(concat!("Unable to load ", stringify!(use_program)))
                 }
                 let val = f(c"glUseProgram");
@@ -377,7 +381,7 @@ impl FnV2_0 {
                 }
             },
             uniform_matrix_4fv: unsafe {
-                unsafe extern "system" fn uniform_matrix_4fv(location: GLint, count: GLsizei, transpose: GLboolean, value: *const GLfloat) {
+                unsafe extern "system" fn uniform_matrix_4fv(_location: GLint, _count: GLsizei, _transpose: GLboolean, _value: *const GLfloat) {
                     panic!(concat!("Unable to load ", stringify!(uniform_matrix_4fv)))
                 }
                 let val = f(c"glUniformMatrix4fv");
@@ -388,7 +392,7 @@ impl FnV2_0 {
                 }
             },
             vertex_attrib_pointer: unsafe {
-                unsafe extern "system" fn vertex_attrib_pointer(index: GLuint, size: GLint, type_: GLenum, normalized: GLboolean, stride: GLsizei, pointer: *const c_void) {
+                unsafe extern "system" fn vertex_attrib_pointer(_index: GLuint, _size: GLint, _type: GLenum, _normalized: GLboolean, _stride: GLsizei, _pointer: *const c_void) {
                     panic!(concat!("Unable to load ", stringify!(vertex_attrib_pointer)))
                 }
                 let val = f(c"glVertexAttribPointer");
@@ -426,7 +430,7 @@ impl FnV3_0 {
     fn load_erased(f: &mut dyn FnMut(&CStr) -> *const c_void) -> Self {
         Self {
             bind_renderbuffer: unsafe {
-                unsafe extern "system" fn bind_renderbuffer(target: GLenum, renderbuffer: GLuint) {
+                unsafe extern "system" fn bind_renderbuffer(_target: GLenum, _renderbuffer: GLuint) {
                     panic!(concat!("Unable to load ", stringify!(bind_renderbuffer)))
                 }
                 let val = f(c"glBindRenderbuffer");
@@ -437,7 +441,7 @@ impl FnV3_0 {
                 }
             },
             delete_renderbuffers: unsafe {
-                unsafe extern "system" fn delete_renderbuffers(n: GLsizei, renderbuffers: *const GLuint) {
+                unsafe extern "system" fn delete_renderbuffers(_n: GLsizei, _renderbuffers: *const GLuint) {
                     panic!(concat!("Unable to load ", stringify!(delete_renderbuffers)))
                 }
                 let val = f(c"glDeleteRenderbuffers");
@@ -448,7 +452,7 @@ impl FnV3_0 {
                 }
             },
             gen_renderbuffers: unsafe {
-                unsafe extern "system" fn gen_renderbuffers(n: GLsizei, renderbuffers: *mut GLuint) {
+                unsafe extern "system" fn gen_renderbuffers(_n: GLsizei, _renderbuffers: *mut GLuint) {
                     panic!(concat!("Unable to load ", stringify!(gen_renderbuffers)))
                 }
                 let val = f(c"glGenRenderbuffers");
@@ -459,7 +463,7 @@ impl FnV3_0 {
                 }
             },
             bind_framebuffer: unsafe {
-                unsafe extern "system" fn bind_framebuffer(target: GLenum, framebuffer: GLuint) {
+                unsafe extern "system" fn bind_framebuffer(_target: GLenum, _framebuffer: GLuint) {
                     panic!(concat!("Unable to load ", stringify!(bind_framebuffer)))
                 }
                 let val = f(c"glBindFramebuffer");
@@ -470,7 +474,7 @@ impl FnV3_0 {
                 }
             },
             delete_framebuffers: unsafe {
-                unsafe extern "system" fn delete_framebuffers(n: GLsizei, framebuffers: *const GLuint) {
+                unsafe extern "system" fn delete_framebuffers(_n: GLsizei, _framebuffers: *const GLuint) {
                     panic!(concat!("Unable to load ", stringify!(delete_framebuffers)))
                 }
                 let val = f(c"glDeleteFramebuffers");
@@ -481,7 +485,7 @@ impl FnV3_0 {
                 }
             },
             gen_framebuffers: unsafe {
-                unsafe extern "system" fn gen_framebuffers(n: GLsizei, framebuffers: *mut GLuint) {
+                unsafe extern "system" fn gen_framebuffers(_n: GLsizei, _framebuffers: *mut GLuint) {
                     panic!(concat!("Unable to load ", stringify!(gen_framebuffers)))
                 }
                 let val = f(c"glGenFramebuffers");
@@ -492,7 +496,7 @@ impl FnV3_0 {
                 }
             },
             check_framebuffer_status: unsafe {
-                unsafe extern "system" fn check_framebuffer_status(target: GLenum) -> GLenum {
+                unsafe extern "system" fn check_framebuffer_status(_target: GLenum) -> GLenum {
                     panic!(concat!("Unable to load ", stringify!(check_framebuffer_status)))
                 }
                 let val = f(c"glCheckFramebufferStatus");
@@ -503,7 +507,7 @@ impl FnV3_0 {
                 }
             },
             framebuffer_renderbuffer: unsafe {
-                unsafe extern "system" fn framebuffer_renderbuffer(target: GLenum, attachment: GLenum, renderbuffertarget: GLenum, renderbuffer: GLuint) {
+                unsafe extern "system" fn framebuffer_renderbuffer(_target: GLenum, _attachment: GLenum, _renderbuffertarget: GLenum, _renderbuffer: GLuint) {
                     panic!(concat!("Unable to load ", stringify!(framebuffer_renderbuffer)))
                 }
                 let val = f(c"glFramebufferRenderbuffer");
@@ -514,7 +518,7 @@ impl FnV3_0 {
                 }
             },
             blit_framebuffer: unsafe {
-                unsafe extern "system" fn blit_framebuffer(srcX0: GLint, srcY0: GLint, srcX1: GLint, srcY1: GLint, dstX0: GLint, dstY0: GLint, dstX1: GLint, dstY1: GLint, mask: GLbitfield, filter: GLenum) {
+                unsafe extern "system" fn blit_framebuffer(_srcX0: GLint, _srcY0: GLint, _srcX1: GLint, _srcY1: GLint, _dstX0: GLint, _dstY0: GLint, _dstX1: GLint, _dstY1: GLint, _mask: GLbitfield, _filter: GLenum) {
                     panic!(concat!("Unable to load ", stringify!(blit_framebuffer)))
                 }
                 let val = f(c"glBlitFramebuffer");
@@ -525,7 +529,7 @@ impl FnV3_0 {
                 }
             },
             renderbuffer_storage_multisample: unsafe {
-                unsafe extern "system" fn renderbuffer_storage_multisample(target: GLenum, samples: GLsizei, internalformat: GLenum, width: GLsizei, height: GLsizei) {
+                unsafe extern "system" fn renderbuffer_storage_multisample(_target: GLenum, _samples: GLsizei, _internalformat: GLenum, _width: GLsizei, _height: GLsizei) {
                     panic!(concat!("Unable to load ", stringify!(renderbuffer_storage_multisample)))
                 }
                 let val = f(c"glRenderbufferStorageMultisample");
@@ -536,7 +540,7 @@ impl FnV3_0 {
                 }
             },
             bind_vertex_array: unsafe {
-                unsafe extern "system" fn bind_vertex_array(array: GLuint) {
+                unsafe extern "system" fn bind_vertex_array(_array: GLuint) {
                     panic!(concat!("Unable to load ", stringify!(bind_vertex_array)))
                 }
                 let val = f(c"glBindVertexArray");
@@ -547,7 +551,7 @@ impl FnV3_0 {
                 }
             },
             delete_vertex_arrays: unsafe {
-                unsafe extern "system" fn delete_vertex_arrays(n: GLsizei, arrays: *const GLuint) {
+                unsafe extern "system" fn delete_vertex_arrays(_n: GLsizei, _arrays: *const GLuint) {
                     panic!(concat!("Unable to load ", stringify!(delete_vertex_arrays)))
                 }
                 let val = f(c"glDeleteVertexArrays");
@@ -558,7 +562,7 @@ impl FnV3_0 {
                 }
             },
             gen_vertex_arrays: unsafe {
-                unsafe extern "system" fn gen_vertex_arrays(n: GLsizei, arrays: *mut GLuint) {
+                unsafe extern "system" fn gen_vertex_arrays(_n: GLsizei, _arrays: *mut GLuint) {
                     panic!(concat!("Unable to load ", stringify!(gen_vertex_arrays)))
                 }
                 let val = f(c"glGenVertexArrays");
@@ -585,51 +589,52 @@ impl Context {
         }
     }
 
+    #[cfg(debug_assertions)]
     unsafe fn check_error(&self) {
-        #[cfg(debug_assertions)]
-        {
-            let error_code = self.get_error();
-            if error_code != NO_ERROR {
-                let error_str = match error_code {
-                    INVALID_ENUM => "GL_INVALID_ENUM",
-                    INVALID_VALUE => "GL_INVALID_VALUE",
-                    INVALID_OPERATION => "GL_INVALID_OPERATION",
-                    INVALID_FRAMEBUFFER_OPERATION => "GL_INVALID_FRAMEBUFFER_OPERATION",
-                    OUT_OF_MEMORY => "GL_OUT_OF_MEMORY",
-                    STACK_UNDERFLOW => "GL_STACK_UNDERFLOW",
-                    STACK_OVERFLOW => "GL_STACK_OVERFLOW",
-                    _ => unreachable!(),
-                };
-                let error_desc = match error_code {
-                    INVALID_ENUM => "An unacceptable value is specified for an enumerated argument.",
-                    INVALID_VALUE => "A numeric argument is out of range.",
-                    INVALID_OPERATION => "The specified operation is not allowed in the current state.",
-                    INVALID_FRAMEBUFFER_OPERATION => "The framebuffer object is not complete.",
-                    OUT_OF_MEMORY => "There is not enough memory left to execute the command.",
-                    STACK_UNDERFLOW => "An attempt has been made to perform an operation that would cause an internal stack to underflow.",
-                    STACK_OVERFLOW => "An attempt has been made to perform an operation that would cause an internal stack to overflow.",
-                    _ => unreachable!(),
-                };
-                panic!("{}: {}", error_str, error_desc);
-            }
+        let error_code = self.get_error();
+        if error_code != NO_ERROR {
+            let error_str = match error_code {
+                INVALID_ENUM => "GL_INVALID_ENUM",
+                INVALID_VALUE => "GL_INVALID_VALUE",
+                INVALID_OPERATION => "GL_INVALID_OPERATION",
+                INVALID_FRAMEBUFFER_OPERATION => "GL_INVALID_FRAMEBUFFER_OPERATION",
+                OUT_OF_MEMORY => "GL_OUT_OF_MEMORY",
+                STACK_UNDERFLOW => "GL_STACK_UNDERFLOW",
+                STACK_OVERFLOW => "GL_STACK_OVERFLOW",
+                _ => unreachable!(),
+            };
+            let error_desc = match error_code {
+                INVALID_ENUM => "An unacceptable value is specified for an enumerated argument.",
+                INVALID_VALUE => "A numeric argument is out of range.",
+                INVALID_OPERATION => "The specified operation is not allowed in the current state.",
+                INVALID_FRAMEBUFFER_OPERATION => "The framebuffer object is not complete.",
+                OUT_OF_MEMORY => "There is not enough memory left to execute the command.",
+                STACK_UNDERFLOW => "An attempt has been made to perform an operation that would cause an internal stack to underflow.",
+                STACK_OVERFLOW => "An attempt has been made to perform an operation that would cause an internal stack to overflow.",
+                _ => unreachable!(),
+            };
+            panic!("{}: {}", error_str, error_desc);
         }
     }
 
     #[inline]
     pub unsafe fn clear_color(&self, red: GLclampf, green: GLclampf, blue: GLclampf, alpha: GLclampf) {
         (self.fn_2_0.clear_color)(red, green, blue, alpha);
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn clear(&self, mask: GLbitfield) {
         (self.fn_2_0.clear)(mask);
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn enable(&self, cap: GLenum) {
         (self.fn_2_0.enable)(cap);
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
@@ -641,54 +646,63 @@ impl Context {
     #[inline]
     pub unsafe fn viewport(&self, x: GLint, y: GLint, width: GLsizei, height: GLsizei) {
         (self.fn_2_0.viewport)(x, y, width, height);
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn draw_arrays(&self, mode: GLenum, first: GLint, count: GLsizei) {
         (self.fn_2_0.draw_arrays)(mode, first, count);
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn bind_buffer(&self, target: GLenum, buffer: GLuint) {
         (self.fn_2_0.bind_buffer)(target, buffer);
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn delete_buffers(&self, buffers: &[GLuint]) {
         (self.fn_2_0.delete_buffers)(buffers.len() as _, buffers.as_ptr());
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn gen_buffers(&self, buffers: &mut [GLuint]) {
         (self.fn_2_0.gen_buffers)(buffers.len() as _, buffers.as_mut_ptr());
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn buffer_data<T>(&self, target: GLenum, data: &[T], usage: GLenum) {
         (self.fn_2_0.buffer_data)(target, (data.len() * mem::size_of::<T>()) as _, data.as_ptr() as _, usage);
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn attach_shader(&self, program: GLuint, shader: GLuint) {
         (self.fn_2_0.attach_shader)(program, shader);
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn compile_shader(&self, shader: GLuint) {
         (self.fn_2_0.compile_shader)(shader);
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn create_program(&self) -> GLuint {
         let result = (self.fn_2_0.create_program)();
+        #[cfg(debug_assertions)]
         self.check_error();
         result
     }
@@ -696,6 +710,7 @@ impl Context {
     #[inline]
     pub unsafe fn create_shader(&self, type_: GLenum) -> GLuint {
         let result = (self.fn_2_0.create_shader)(type_);
+        #[cfg(debug_assertions)]
         self.check_error();
         result
     }
@@ -703,30 +718,35 @@ impl Context {
     #[inline]
     pub unsafe fn delete_program(&self, program: GLuint) {
         (self.fn_2_0.delete_program)(program);
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn delete_shader(&self, shader: GLuint) {
         (self.fn_2_0.delete_shader)(shader);
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn disable_vertex_attrib_array(&self, index: GLuint) {
         (self.fn_2_0.disable_vertex_attrib_array)(index);
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn enable_vertex_attrib_array(&self, index: GLuint) {
         (self.fn_2_0.enable_vertex_attrib_array)(index);
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn get_attrib_location(&self, program: GLuint, name: &CStr) -> GLint {
         let result = (self.fn_2_0.get_attrib_location)(program, name.as_ptr());
+        #[cfg(debug_assertions)]
         self.check_error();
         result
     }
@@ -734,6 +754,7 @@ impl Context {
     #[inline]
     pub unsafe fn get_uniform_location(&self, program: GLuint, name: &CStr) -> GLint {
         let result = (self.fn_2_0.get_uniform_location)(program, name.as_ptr());
+        #[cfg(debug_assertions)]
         self.check_error();
         result
     }
@@ -741,76 +762,85 @@ impl Context {
     #[inline]
     pub unsafe fn link_program(&self, program: GLuint) {
         (self.fn_2_0.link_program)(program);
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn shader_source(&self, shader: GLuint, string: &[*const GLchar], length: Option<&[GLint]>) {
-        #[cfg(debug_assertions)]
-        if let Some(length) = length {
-            assert_eq!(string.len(), length.len());
-        }
+        // string.len() and length.len() should be equal
         (self.fn_2_0.shader_source)(shader, string.len() as _, string.as_ptr(), if let Some(length) = length { length.as_ptr() } else { ptr::null() });
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn use_program(&self, program: GLuint) {
         (self.fn_2_0.use_program)(program);
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn uniform_matrix_4fv(&self, location: GLint, count: GLsizei, transpose: bool, value: &[GLfloat]) {
         (self.fn_2_0.uniform_matrix_4fv)(location, count, if transpose { TRUE } else { FALSE }, value.as_ptr());
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn vertex_attrib_pointer(&self, index: GLuint, size: GLint, type_: GLenum, normalized: bool, stride: GLsizei, pointer: usize) {
         (self.fn_2_0.vertex_attrib_pointer)(index, size, type_, if normalized { TRUE } else { FALSE }, stride, pointer as _);
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn bind_renderbuffer(&self, target: GLenum, renderbuffer: GLuint) {
         (self.fn_3_0.bind_renderbuffer)(target, renderbuffer);
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn delete_renderbuffers(&self, renderbuffers: &[GLuint]) {
         (self.fn_3_0.delete_renderbuffers)(renderbuffers.len() as _, renderbuffers.as_ptr());
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn gen_renderbuffers(&self, renderbuffers: &mut [GLuint]) {
         (self.fn_3_0.gen_renderbuffers)(renderbuffers.len() as _, renderbuffers.as_mut_ptr());
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn bind_framebuffer(&self, target: GLenum, framebuffer: GLuint) {
         (self.fn_3_0.bind_framebuffer)(target, framebuffer);
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn delete_framebuffers(&self, framebuffers: &[GLuint]) {
         (self.fn_3_0.delete_framebuffers)(framebuffers.len() as _, framebuffers.as_ptr());
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn gen_framebuffers(&self, framebuffers: &mut [GLuint]) {
         (self.fn_3_0.gen_framebuffers)(framebuffers.len() as _, framebuffers.as_mut_ptr());
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn check_framebuffer_status(&self, target: GLenum) -> GLenum {
         let result = (self.fn_3_0.check_framebuffer_status)(target);
+        #[cfg(debug_assertions)]
         self.check_error();
         result
     }
@@ -818,36 +848,42 @@ impl Context {
     #[inline]
     pub unsafe fn framebuffer_renderbuffer(&self, target: GLenum, attachment: GLenum, renderbuffertarget: GLenum, renderbuffer: GLuint) {
         (self.fn_3_0.framebuffer_renderbuffer)(target, attachment, renderbuffertarget, renderbuffer);
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn blit_framebuffer(&self, srcX0: GLint, srcY0: GLint, srcX1: GLint, srcY1: GLint, dstX0: GLint, dstY0: GLint, dstX1: GLint, dstY1: GLint, mask: GLbitfield, filter: GLenum) {
         (self.fn_3_0.blit_framebuffer)(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn renderbuffer_storage_multisample(&self, target: GLenum, samples: GLsizei, internalformat: GLenum, width: GLsizei, height: GLsizei) {
         (self.fn_3_0.renderbuffer_storage_multisample)(target, samples, internalformat, width, height);
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn bind_vertex_array(&self, array: GLuint) {
         (self.fn_3_0.bind_vertex_array)(array);
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn delete_vertex_arrays(&self, arrays: &[GLuint]) {
         (self.fn_3_0.delete_vertex_arrays)(arrays.len() as _, arrays.as_ptr());
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 
     #[inline]
     pub unsafe fn gen_vertex_arrays(&self, arrays: &mut [GLuint]) {
         (self.fn_3_0.gen_vertex_arrays)(arrays.len() as _, arrays.as_mut_ptr());
+        #[cfg(debug_assertions)]
         self.check_error();
     }
 }
